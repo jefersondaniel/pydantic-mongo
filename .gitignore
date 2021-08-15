@@ -1,0 +1,14 @@
+*.pyc
+*.pyo
+.cache
+.coverage
+.coverage.*
+.eggs
+.vscode
+coverage.xml
+venv/
+dist/
+build/
+pydantic_mongo.egg-info/
+var/
+.pytest_cache/

@@ -1,0 +1,4 @@
+[run]
+branch = False
+omit=
+    pydantic_mongo/__init__.py
