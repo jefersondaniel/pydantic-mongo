@@ -1,7 +1,7 @@
 Pydantic Mongo
 ======================================
 
-|Build Status| |Version| |Pyversions|
+|Build Status| |Maintainability| |Test Coverage| |Version| |Pyversions|
 
 Document object mapper for pydantic and pymongo
 
@@ -71,8 +71,14 @@ Install:
 
 ''''
 
-.. |Build Status| image:: https://travis-ci.org/jefersondaniel/pydantic-mongo.svg
-   :target: https://travis-ci.org/jefersondaniel/pydantic-mongo
+.. |Build Status| image:: https://github.com/jefersondaniel/pydantic-mongo/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/jefersondaniel/pydantic-mongo/actions
+
+.. |Maintainability| image:: https://api.codeclimate.com/v1/badges/5c92ea54aefa29f919cf/maintainability
+   :target: https://codeclimate.com/github/jefersondaniel/pydantic-mongo/maintainability
+
+.. |Test Coverage| image:: https://api.codeclimate.com/v1/badges/5c92ea54aefa29f919cf/test_coverage
+   :target: https://codeclimate.com/github/jefersondaniel/pydantic-mongo/test_coverage
 
 .. |Version| image:: https://badge.fury.io/py/pydantic-mongo.svg
    :target: https://pypi.python.org/pypi/pydantic-mongo
