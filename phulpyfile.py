@@ -26,7 +26,6 @@ def unit_test(phulpy):
         raise Exception('Unit tests failed')
     coverage_path = join(dirname(__file__), 'coverage.xml')
     xml = ET.parse(coverage_path).getroot()
-    unlink(coverage_path)
     if float(xml.get('line-rate')) < 1:
         raise Exception('Unit test is not fully covered')
 
