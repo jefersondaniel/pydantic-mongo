@@ -16,6 +16,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements_test.txt
-    - name: Test with phulp
-      run: |
-        phulpy test
+    - name: Test & publish code coverage
+      uses: paambaati/codeclimate-action@v2.7.5
+      env:
+        CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+      with:
+        coverageCommand: phulpy test
+        debug: true
