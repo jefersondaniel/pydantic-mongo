@@ -3,7 +3,7 @@ from base64 import b64decode, b64encode
 from bson import ObjectId
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
-from typing import Generic, TypeVar, Any
+from typing import Generic, TypeVar, Any, List
 import bson
 import zlib
 
@@ -18,13 +18,13 @@ class Edge(GenericModel, Generic[DataT]):
         json_encoders = {ObjectId: str}
 
 
-def encode_pagination_cursor(data: list) -> str:
+def encode_pagination_cursor(data: List) -> str:
     byte_data = bson.BSON.encode({'v': data})
     byte_data = zlib.compress(byte_data, 9)
     return b64encode(byte_data).decode('utf-8')
 
 
-def decode_pagination_cursor(data: str) -> list:
+def decode_pagination_cursor(data: str) -> List:
     try:
         byte_data = b64decode(data.encode('utf-8'))
         byte_data = zlib.decompress(byte_data)
@@ -34,7 +34,7 @@ def decode_pagination_cursor(data: str) -> list:
         raise PaginationError('Invalid cursor')
 
 
-def get_pagination_cursor_payload(model: BaseModel, keys: list[str]) -> list[Any]:
+def get_pagination_cursor_payload(model: BaseModel, keys: List[str]) -> List[Any]:
     model_dict = model.dict()
     model_dict['_id'] = model_dict['id']
 
