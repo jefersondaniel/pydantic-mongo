@@ -4,6 +4,7 @@ from bson import ObjectId
 from typing import List
 from pydantic_mongo import AbstractRepository, ObjectIdField
 from pydantic import BaseModel
+from pydantic_mongo.errors import PaginationError
 
 
 class Foo(BaseModel):
@@ -109,7 +110,7 @@ class TestRepository:
         assert 3 == results[1].foo.count
 
         # Find with optional parameters
-        result = spam_repository.find_by({}, skip=10, limit=10, sort=[('foo.count', 1)])
+        result = spam_repository.find_by({}, skip=10, limit=10, sort=[('foo.count', 1), ('id', 1)])
         results = [x for x in result]
         assert 0 == len(results)
 
@@ -138,3 +139,49 @@ class TestRepository:
 
         with pytest.raises(Exception):
             BrokenRepository(database=database)
+
+    def test_paginate(self, database):
+        database.spams.insert_many([
+            {
+                '_id': ObjectId('611b140f4eb6ee47e966860f'),
+                'foo': {'count': 2, 'size': 1.0},
+                'bars': [{'apple': 'x', 'banana': 'y'}]
+            },
+            {
+                'id': ObjectId('611b141cf533ca420b7580d6'),
+                'foo': {'count': 3, 'size': 1.0},
+                'bars': [{'apple': 'x', 'banana': 'y'}]
+            },
+            {
+                '_id': ObjectId('611b15241dea2ee3f7cbfe30'),
+                'foo': {'count': 2, 'size': 1.0},
+                'bars': [{'apple': 'x', 'banana': 'y'}]
+            },
+            {
+                '_id': ObjectId('611b157c859bde7de88c98ac'),
+                'foo': {'count': 2, 'size': 1.0},
+                'bars': [{'apple': 'x', 'banana': 'y'}]
+            },
+            {
+                '_id': ObjectId('611b158adec89d18984b7d90'),
+                'foo': {'count': 2, 'size': 1.0},
+                'bars': [{'apple': 'x', 'banana': 'y'}]
+            },
+        ])
+
+        spam_repository = SpamRepository(database=database)
+
+        # Simple Find
+        result = list(spam_repository.paginate({}, limit=10))
+        assert len(result) == 5
+
+        # Find After
+        result = list(spam_repository.paginate({}, limit=10, after='eNqTYWBgYCljEAFS7AYMidKiXfdOzJWY4V07gYEBAD7HBkg='))
+        assert len(result) == 1
+
+        # Find Before
+        result = list(spam_repository.paginate({}, limit=10, before='eNqTYWBgYCljEAFS7AYMidKiXfdOzJWY4V07gYEBAD7HBkg='))
+        assert len(result) == 3
+
+        with pytest.raises(PaginationError):
+            spam_repository.paginate({}, limit=10, after='invalid string')
