@@ -4,11 +4,11 @@ long_description = open('README.rst', 'r').read()
 
 setup(
     name='pydantic-mongo',
-    version='0.1.1',
+    version='0.1.3',
     packages=['pydantic_mongo'],
     setup_requires=['wheel'],
     install_requires=[
-        'pymongo>=3.12,<4.0',
+        'pymongo>=4.3,<5.0',
         'pydantic>=1.6.2,<2.0.0'
     ],
     entry_points={
