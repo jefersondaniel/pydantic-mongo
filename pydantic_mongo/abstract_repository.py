@@ -87,8 +87,8 @@ class AbstractRepository(Generic[T]):
         query: dict,
         skip: Optional[int] = None,
         limit: Optional[int] = None,
-        sort: Sort = None,
-        projection: Dict[str, int] = None
+        sort: Optional[Sort] = None,
+        projection: Optional[Dict[str, int]] = None
     ) -> Iterable[OutputT]:
         mapped_projection = self.__map_id(projection) if projection else None
         mapped_sort = self.__map_sort(sort) if sort else None
@@ -106,8 +106,8 @@ class AbstractRepository(Generic[T]):
         query: dict,
         skip: Optional[int] = None,
         limit: Optional[int] = None,
-        sort: Sort = None,
-        projection: Dict[str, int] = None
+        sort: Optional[Sort] = None,
+        projection: Optional[Dict[str, int]] = None
     ) -> Iterable[T]:
         return self.find_by_with_output_type(
             output_type=self.__document_class,
@@ -121,9 +121,9 @@ class AbstractRepository(Generic[T]):
     def get_pagination_query(
         self,
         query: dict,
-        after: str = None,
-        before: str = None,
-        sort: Sort = None
+        after: Optional[str] = None,
+        before: Optional[str] = None,
+        sort: Optional[Sort] = None
     ) -> dict:
         generated_query: dict = {'$and': [query]}
         selected_cursor = after or before
@@ -152,10 +152,10 @@ class AbstractRepository(Generic[T]):
         output_type: Type[OutputT],
         query: dict,
         limit: int,
-        after: str = None,
-        before: str = None,
-        sort: Sort = None,
-        projection: Dict[str, int] = None
+        after: Optional[str] = None,
+        before: Optional[str] = None,
+        sort: Optional[Sort] = None,
+        projection: Optional[Dict[str, int]] = None
     ) -> Iterable[Edge[OutputT]]:
         sort_keys = []
 
@@ -190,10 +190,10 @@ class AbstractRepository(Generic[T]):
         self,
         query: dict,
         limit: int,
-        after: str = None,
-        before: str = None,
-        sort: Sort = None,
-        projection: Dict[str, int] = None
+        after: Optional[str] = None,
+        before: Optional[str] = None,
+        sort: Optional[Sort] = None,
+        projection: Optional[Dict[str, int]] = None
     ) -> Iterable[Edge[T]]:
         return self.paginate_with_output_type(
             self.__document_class,
