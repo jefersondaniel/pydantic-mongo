@@ -35,4 +35,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         if: ${{ steps.release.outputs.release_created }}
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }
+          password: ${{ secrets.PYPI_API_TOKEN }}
