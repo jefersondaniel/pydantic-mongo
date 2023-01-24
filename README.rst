@@ -1,7 +1,7 @@
 Pydantic Mongo
 ======================================
 
-|Build Status| |Maintainability| |Test Coverage| |Version| |Pyversions|
+|Build Status| |Maintainability| |Test Coverage| |Version| |Downloads|
 
 Document object mapper for pydantic and pymongo
 
@@ -86,5 +86,5 @@ Install:
 .. |Version| image:: https://badge.fury.io/py/pydantic-mongo.svg
    :target: https://pypi.python.org/pypi/pydantic-mongo
 
-.. |Pyversions| image:: https://img.shields.io/pypi/pyversions/pydantic-mongo.svg
+.. |Downloads| image:: https://img.shields.io/pypi/dm/pydantic-mongo.svg
    :target: https://pypi.python.org/pypi/pydantic-mongo
