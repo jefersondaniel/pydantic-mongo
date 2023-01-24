@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/jefersondaniel/pydantic-mongo/compare/v1.0.0...v1.0.1) (2023-01-24)
+
+
+### Bug Fixes
+
+* Use correct typing for find_one_by_id ([57210d6](https://github.com/jefersondaniel/pydantic-mongo/commit/57210d6a415ad79aec7e7c277f449f819da9b7e9))
+
 ## 1.0.0 (2023-01-19)
 
 
