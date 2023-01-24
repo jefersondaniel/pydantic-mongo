@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Iterable, Sequence, Type, Tuple, TypeVar, Generic
+from typing import Any, Dict, Optional, Iterable, Sequence, Type, Tuple, TypeVar, Generic
 from pydantic import BaseModel
 from .pagination import Edge, encode_pagination_cursor, decode_pagination_cursor, get_pagination_cursor_payload
 
@@ -77,7 +77,7 @@ class AbstractRepository(Generic[T]):
     def find_one_by_id(self, id: str) -> Optional[T]:
         return self.find_one_by({'id': id})
 
-    def find_one_by(self, query: dict) -> Optional[T]:
+    def find_one_by(self, query: Any) -> Optional[T]:
         result = self.get_collection().find_one(self.__map_id(query))
         return self.to_model(result) if result else None
 
