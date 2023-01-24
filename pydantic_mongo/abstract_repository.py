@@ -16,6 +16,9 @@ class AbstractRepository(Generic[T]):
         self.__collection_name = self.Meta.collection_name
         self.__validate()
 
+    """
+    Get pymongo collection
+    """
     def get_collection(self):
         return self.__database[self.__collection_name]
 
@@ -27,6 +30,9 @@ class AbstractRepository(Generic[T]):
         if not self.__collection_name:
             raise Exception('Meta should contain collection name')
 
+    """
+    Convert model to document
+    """
     def to_document(self, model: T) -> dict:
         result = model.dict()
         result.pop('id')
@@ -50,15 +56,24 @@ class AbstractRepository(Generic[T]):
             result.append((key, ordering))
         return result
 
+    """
+    Convert document to model with custom output type
+    """
     def to_model_custom(self, output_type: Type[OutputT], data: dict) -> OutputT:
         data_copy = data.copy()
         if '_id' in data_copy:
             data_copy['id'] = data_copy.pop('_id')
         return output_type.parse_obj(data_copy)
 
+    """
+    Convert document to model
+    """
     def to_model(self, data: dict) -> T:
         return self.to_model_custom(self.__document_class, data)
 
+    """
+    Save entity to database. It will update the entity if it has id, otherwise it will insert it.
+    """
     def save(self, model: T):
         document = self.to_document(model)
 
@@ -74,13 +89,24 @@ class AbstractRepository(Generic[T]):
     def delete(self, model: T):
         return self.get_collection().delete_one({'_id': model.id})
 
-    def find_one_by_id(self, id: str) -> Optional[T]:
+    """
+    Find entity by id
+
+    Note: The id should be of the same type as the id field in the document class, ie. ObjectId
+    """
+    def find_one_by_id(self, id: Any) -> Optional[T]:
         return self.find_one_by({'id': id})
 
-    def find_one_by(self, query: Any) -> Optional[T]:
+    """
+    Find entity by mongo query
+    """
+    def find_one_by(self, query: dict) -> Optional[T]:
         result = self.get_collection().find_one(self.__map_id(query))
         return self.to_model(result) if result else None
 
+    """
+    Find entities by mongo query allowing custom output type
+    """
     def find_by_with_output_type(
         self,
         output_type: Type[OutputT],
@@ -101,6 +127,9 @@ class AbstractRepository(Generic[T]):
             cursor.sort(mapped_sort)
         return map(lambda doc: self.to_model_custom(output_type, doc), cursor)
 
+    """"
+    Find entities by mongo query
+    """
     def find_by(
         self,
         query: dict,
@@ -118,6 +147,9 @@ class AbstractRepository(Generic[T]):
             projection=projection
         )
 
+    """
+    Build pagination query based on the cursor and sort
+    """
     def get_pagination_query(
         self,
         query: dict,
@@ -147,6 +179,9 @@ class AbstractRepository(Generic[T]):
 
         return generated_query
 
+    """
+    Paginate entities by mongo query allowing custom output type
+    """
     def paginate_with_output_type(
         self,
         output_type: Type[OutputT],
@@ -186,6 +221,11 @@ class AbstractRepository(Generic[T]):
             models
         )
 
+    """"
+    Paginate entities by mongo query using cursor based pagination
+
+    Return type is an iterable of Edge objects, which contain the model and the cursor
+    """
     def paginate(
         self,
         query: dict,
