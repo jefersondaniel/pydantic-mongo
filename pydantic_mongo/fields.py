@@ -1,7 +1,7 @@
 from bson import ObjectId
 
 
-class ObjectIdField():
+class ObjectIdField:
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
