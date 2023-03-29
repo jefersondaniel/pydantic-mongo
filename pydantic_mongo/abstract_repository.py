@@ -32,14 +32,14 @@ Sort = Sequence[Tuple[str, int]]
 class AbstractRepository(Generic[T]):
     class Meta:
         collection_name: str
-        document_class: Optional[Type[T]] = None
 
     def __init__(self, database: Database):
         super().__init__()
         self.__database: Database = database
-        self.__document_class: Type[T] = (
-            getattr(self.Meta, "document_class", None)
-            or self.__orig_bases__[0].__args__[0]
+        self.__document_class = (
+            getattr(self.Meta, "document_class")
+            if hasattr(self.Meta, "document_class")
+            else self.__orig_bases__[0].__args__[0]
         )
         self.__collection_name = self.Meta.collection_name
         self.__validate()
