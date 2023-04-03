@@ -39,7 +39,7 @@ class AbstractRepository(Generic[T]):
         self.__document_class = (
             getattr(self.Meta, "document_class")
             if hasattr(self.Meta, "document_class")
-            else self.__orig_bases__[0].__args__[0]
+            else self.__orig_bases__[0].__args__[0]  # type: ignore
         )
         self.__collection_name = self.Meta.collection_name
         self.__validate()
