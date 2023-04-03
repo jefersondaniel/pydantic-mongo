@@ -1,13 +1,15 @@
-from .errors import PaginationError
+import zlib
 from base64 import b64decode, b64encode
+from typing import Any, Generic, List, TypeVar
+
+import bson
 from bson import ObjectId
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
-from typing import Generic, TypeVar, Any, List
-import bson
-import zlib
 
-DataT = TypeVar('DataT')
+from .errors import PaginationError
+
+DataT = TypeVar("DataT")
 
 
 class Edge(GenericModel, Generic[DataT]):
@@ -19,32 +21,30 @@ class Edge(GenericModel, Generic[DataT]):
 
 
 def encode_pagination_cursor(data: List) -> str:
-    byte_data = bson.BSON.encode({'v': data})
+    byte_data = bson.BSON.encode({"v": data})
     byte_data = zlib.compress(byte_data, 9)
-    return b64encode(byte_data).decode('utf-8')
+    return b64encode(byte_data).decode("utf-8")
 
 
 def decode_pagination_cursor(data: str) -> List:
     try:
-        byte_data = b64decode(data.encode('utf-8'))
+        byte_data = b64decode(data.encode("utf-8"))
         byte_data = zlib.decompress(byte_data)
         result = bson.BSON(byte_data).decode()
-        return result['v']
+        return result["v"]
     except Exception:
-        raise PaginationError('Invalid cursor')
+        raise PaginationError("Invalid cursor")
 
 
 def get_pagination_cursor_payload(model: BaseModel, keys: List[str]) -> List[Any]:
     model_dict = model.dict()
-    model_dict['_id'] = model_dict['id']
+    model_dict["_id"] = model_dict["id"]
 
-    return [
-        __evaluate_dot_notation(model_dict, key) for key in keys
-    ]
+    return [__evaluate_dot_notation(model_dict, key) for key in keys]
 
 
 def __evaluate_dot_notation(data: Any, path: str):
-    pieces = path.split('.')
+    pieces = path.split(".")
 
     if len(pieces) == 1:
         return data[path]
