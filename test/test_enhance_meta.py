@@ -1,10 +1,11 @@
 import pytest
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 from pydantic_mongo import AbstractRepository, ObjectIdField
 
 
 class HamModel(BaseModel):
-    id: ObjectIdField = None
+    id: ObjectIdField = Field(default=None)
     name: str
 
 

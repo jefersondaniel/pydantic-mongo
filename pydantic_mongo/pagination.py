@@ -3,21 +3,16 @@ from base64 import b64decode, b64encode
 from typing import Any, Generic, List, TypeVar
 
 import bson
-from bson import ObjectId
 from pydantic import BaseModel
-from pydantic.generics import GenericModel
 
 from .errors import PaginationError
 
 DataT = TypeVar("DataT")
 
 
-class Edge(GenericModel, Generic[DataT]):
+class Edge(BaseModel, Generic[DataT]):
     node: DataT
     cursor: str
-
-    class Config:
-        json_encoders = {ObjectId: str}
 
 
 def encode_pagination_cursor(data: List) -> str:
@@ -37,7 +32,7 @@ def decode_pagination_cursor(data: str) -> List:
 
 
 def get_pagination_cursor_payload(model: BaseModel, keys: List[str]) -> List[Any]:
-    model_dict = model.dict()
+    model_dict = model.model_dump()
     model_dict["_id"] = model_dict["id"]
 
     return [__evaluate_dot_notation(model_dict, key) for key in keys]

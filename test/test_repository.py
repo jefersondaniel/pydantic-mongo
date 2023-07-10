@@ -3,7 +3,8 @@ from typing import List
 import mongomock
 import pytest
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
 from pydantic_mongo import AbstractRepository, ObjectIdField
 from pydantic_mongo.errors import PaginationError
 
@@ -14,17 +15,14 @@ class Foo(BaseModel):
 
 
 class Bar(BaseModel):
-    apple = "x"
-    banana = "y"
+    apple: str = Field(default="x")
+    banana: str = Field(default="y")
 
 
 class Spam(BaseModel):
     id: ObjectIdField = None
     foo: Foo
     bars: List[Bar]
-
-    class Config:
-        json_encoders = {ObjectId: str}
 
 
 class SpamRepository(AbstractRepository[Spam]):
