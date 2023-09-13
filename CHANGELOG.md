@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.0.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v1.0.1...v2.0.0) (2023-09-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* Saving entities will upsert if the id is present
+* **deps:** Moving to Pydantic V2
+* **deps:** Python 3.7 will no longer be supported since it reached EOL
+
+### Features
+
+* Enhance existing repo with improved meta data ([#8](https://github.com/jefersondaniel/pydantic-mongo/issues/8)) ([9c234d1](https://github.com/jefersondaniel/pydantic-mongo/commit/9c234d1fee8006bd846621840ed8d1851b2ac00d))
+* Implement save_many method in repositories ([8824622](https://github.com/jefersondaniel/pydantic-mongo/commit/8824622407d043905e76fae8107e172f91a919a2))
+
+
+### Bug Fixes
+
+* Uses upsert in save method ([1a89b5b](https://github.com/jefersondaniel/pydantic-mongo/commit/1a89b5b0bf8f64069b783818254893751991634b))
+
+
+### Miscellaneous Chores
+
+* **deps:** Deprecate python 3.7 ([#14](https://github.com/jefersondaniel/pydantic-mongo/issues/14)) ([d01bb52](https://github.com/jefersondaniel/pydantic-mongo/commit/d01bb521d2fcafc508662ad5605e94010d402a35))
+* **deps:** Pydantic V2  ([#12](https://github.com/jefersondaniel/pydantic-mongo/issues/12)) ([561c122](https://github.com/jefersondaniel/pydantic-mongo/commit/561c12277f1771bdaef52d4a1ef66ea9c6721326))
+
 ## [1.0.1](https://github.com/jefersondaniel/pydantic-mongo/compare/v1.0.0...v1.0.1) (2023-01-24)
 
 
