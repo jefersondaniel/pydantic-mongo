@@ -12,6 +12,7 @@ from typing import (
 )
 
 from pydantic import BaseModel
+from pymongo import UpdateOne
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.results import InsertOneResult, UpdateResult
@@ -118,6 +119,37 @@ class AbstractRepository(Generic[T]):
         result = self.get_collection().insert_one(document)
         model.id = result.inserted_id
         return result
+
+    def save_many(self, models: Iterable[T]):
+        """
+        Save multiple entities to database
+        """
+        models_to_insert = []
+        models_to_update = []
+
+        for model in models:
+            if model.id:
+                models_to_update.append(model)
+            else:
+                models_to_insert.append(model)
+
+        result = self.get_collection().insert_many(
+            (self.to_document(model) for model in models_to_insert)
+        )
+
+        for idx, inserted_id in enumerate(result.inserted_ids):
+            models_to_insert[idx].id = inserted_id
+
+        if len(models_to_update) == 0:
+            return
+
+        documents_to_update = [self.to_document(model) for model in models_to_update]
+        mongo_ids = [doc.pop("_id") for doc in documents_to_update]
+        bulk_operations = [
+            UpdateOne({"_id": mongo_id}, {"$set": document}, upsert=True)
+            for mongo_id, document in zip(mongo_ids, documents_to_update)
+        ]
+        self.get_collection().bulk_write(bulk_operations)
 
     def delete(self, model: T):
         return self.get_collection().delete_one({"_id": model.id})

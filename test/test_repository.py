@@ -21,8 +21,8 @@ class Bar(BaseModel):
 
 class Spam(BaseModel):
     id: ObjectIdField = None
-    foo: Foo
-    bars: List[Bar]
+    foo: Foo = None
+    bars: List[Bar] = None
 
 
 class SpamRepository(AbstractRepository[Spam]):
@@ -72,6 +72,39 @@ class TestRepository:
             "foo": {"count": 1, "size": 1.0},
             "bars": [],
         } == database["spams"].find()[0]
+
+    def test_save_many(self, database):
+        spam_repository = SpamRepository(database=database)
+        spams = [
+            Spam(),
+            Spam(id=ObjectId("65012da68ea5a4798502f710")),
+        ]
+        spam_repository.save_many(spams)
+
+        initial_data = [
+            {
+                "_id": ObjectId(spams[0].id),
+                "foo": None,
+                "bars": None,
+            },
+            {
+                "_id": ObjectId(spams[1].id),
+                "foo": None,
+                "bars": None,
+            },
+        ]
+
+        assert initial_data == list(database["spams"].find())
+
+        # Calling save_many again will only update
+        spam_repository.save_many(spams)
+        assert initial_data == list(database["spams"].find())
+
+        # Calling save_many with only a new model will only insert
+        new_span = Spam()
+        spam_repository.save_many([new_span])
+        assert new_span.id is not None
+        assert 3 == database["spams"].count_documents({})
 
     def test_delete(self, database):
         spam_repository = SpamRepository(database=database)
