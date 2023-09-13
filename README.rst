@@ -20,9 +20,6 @@ Install:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-Example Code
-^^^^^^^^^^^^
-
 .. code:: python
 
     from pydantic import BaseModel
