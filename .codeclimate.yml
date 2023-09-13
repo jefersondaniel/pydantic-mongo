@@ -1,0 +1,8 @@
+version: "2"
+checks:
+  argument-count:
+    config:
+      threshold: 10 # Python allows named arguments, so this is a bit higher than the default
+  method-complexity:
+    config:
+      threshold: 10
