@@ -1,4 +1,5 @@
 import os
+
 from setuptools import setup
 
 long_description = open("README.rst", "r").read()
@@ -15,7 +16,7 @@ setup(
     version=version,
     packages=["pydantic_mongo"],
     setup_requires=["wheel"],
-    install_requires=["pymongo>=4.3,<5.0", "pydantic>=1.6.2,<2.0.0"],
+    install_requires=["pymongo>=4.3,<5.0", "pydantic>=2.0.2,<3.0.0"],
     entry_points={
         "console_scripts": ["pydantic_mongo = pydantic_mongo.__main__:__main__"],
     },

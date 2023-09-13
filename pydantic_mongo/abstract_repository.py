@@ -54,20 +54,23 @@ class AbstractRepository(Generic[T]):
     def __validate(self):
         if not issubclass(self.__document_class, BaseModel):
             raise Exception("Document class should inherit BaseModel")
-        if "id" not in self.__document_class.__fields__:
+        if "id" not in self.__document_class.model_fields:
             raise Exception("Document class should have id field")
         if not self.__collection_name:
             raise Exception("Meta should contain collection name")
 
-    def to_document(self, model: T) -> dict:
+    @staticmethod
+    def to_document(model: T) -> dict:
         """
         Convert model to document
+        :param model:
+        :return: dict
         """
-        result = model.dict()
-        result.pop("id")
+        data = model.model_dump()
+        data.pop("id")
         if model.id:
-            result["_id"] = model.id
-        return result
+            data["_id"] = model.id
+        return data
 
     def __map_id(self, data: dict) -> dict:
         query = data.copy()
@@ -92,7 +95,7 @@ class AbstractRepository(Generic[T]):
         data_copy = data.copy()
         if "_id" in data_copy:
             data_copy["id"] = data_copy.pop("_id")
-        return output_type.parse_obj(data_copy)
+        return output_type.model_validate(data_copy)
 
     def to_model(self, data: dict) -> T:
         """
