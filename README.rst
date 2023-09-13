@@ -20,6 +20,9 @@ Install:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+Example Code
+^^^^^
+
 .. code:: python
 
     from pydantic import BaseModel
@@ -40,10 +43,6 @@ Install:
         foo: Foo
         bars: List[Bar]
 
-        class Config:
-            # The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding
-            json_encoders = {ObjectId: str}
-
     class SpamRepository(AbstractRepository[Spam]):
         class Meta:
             collection_name = 'spams'
@@ -57,6 +56,9 @@ Install:
 
     # Insert / Update
     spam_repository.save(spam)
+
+    # Insert / Update many items
+   spam_repository.save_many([spam])
 
     # Delete
     spam_repository.delete(spam)
@@ -73,6 +75,10 @@ Install:
     # Find By Query
     results = spam_repository.find_by({'foo.count': {'$gte': 1}})
 
+    # Paginate using cursor based pagination
+    edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1)
+    more_edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1, after=edges[-1].cursor)
+    last_model = more_edges[-1].node
 ''''
 
 .. |Build Status| image:: https://github.com/jefersondaniel/pydantic-mongo/actions/workflows/test.yml/badge.svg
