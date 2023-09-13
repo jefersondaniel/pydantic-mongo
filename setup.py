@@ -15,14 +15,9 @@ setup(
     version=version,
     packages=["pydantic_mongo"],
     setup_requires=["wheel"],
-    install_requires=[
-        "pymongo>=4.3,<5.0",
-        "pydantic>=1.6.2,<2.0.0"
-    ],
+    install_requires=["pymongo>=4.3,<5.0", "pydantic>=1.6.2,<2.0.0"],
     entry_points={
-        "console_scripts": [
-            "pydantic_mongo = pydantic_mongo.__main__:__main__"
-        ],
+        "console_scripts": ["pydantic_mongo = pydantic_mongo.__main__:__main__"],
     },
     description="Document object mapper for pydantic and pymongo",
     long_description=long_description,
@@ -33,9 +28,10 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
-    python_requires=">=3.7"
+    python_requires=">=3.8",
 )
