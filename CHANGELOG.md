@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.0...v2.0.1) (2023-09-13)
+
+
+### Bug Fixes
+
+* Syntax error in documentation ([e32ad9d](https://github.com/jefersondaniel/pydantic-mongo/commit/e32ad9d8552160132929110be3b0227ff16afc97))
+
 ## [2.0.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v1.0.1...v2.0.0) (2023-09-13)
 
 
