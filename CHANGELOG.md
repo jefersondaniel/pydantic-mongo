@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.1...v2.0.2) (2023-09-13)
+
+
+### Bug Fixes
+
+* Use markdown for documentation ([1358799](https://github.com/jefersondaniel/pydantic-mongo/commit/1358799567cbb0473d588477b8b85405ae068246))
+
 ## [2.0.1](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.0...v2.0.1) (2023-09-13)
 
 
