@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup
 
-long_description = open("README.rst", "r").read()
+long_description = open("README.md", "r").read()
 
 package_root = os.path.abspath(os.path.dirname(__file__))
 
@@ -22,6 +22,7 @@ setup(
     },
     description="Document object mapper for pydantic and pymongo",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/jefersondaniel/pydantic-mongo",
     author="Jeferson Daniel",
     author_email="jeferson.daniel412@gmail.com",
