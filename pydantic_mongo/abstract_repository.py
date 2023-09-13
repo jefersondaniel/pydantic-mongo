@@ -112,7 +112,7 @@ class AbstractRepository(Generic[T]):
         if model.id:
             mongo_id = document.pop("_id")
             return self.get_collection().update_one(
-                {"_id": mongo_id}, {"$set": document}
+                {"_id": mongo_id}, {"$set": document}, upsert=True
             )
 
         result = self.get_collection().insert_one(document)

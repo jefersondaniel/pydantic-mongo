@@ -58,6 +58,21 @@ class TestRepository:
             "bars": [{"apple": "x", "banana": "y"}],
         } == database["spams"].find()[0]
 
+    def test_save_upsert(self, database):
+        spam_repository = SpamRepository(database=database)
+        spam = Spam(
+            id=ObjectId("65012da68ea5a4798502f710"),
+            foo=Foo(count=1, size=1.0),
+            bars=[]
+        )
+        spam_repository.save(spam)
+
+        assert {
+            "_id": ObjectId(spam.id),
+            "foo": {"count": 1, "size": 1.0},
+            "bars": [],
+        } == database["spams"].find()[0]
+
     def test_delete(self, database):
         spam_repository = SpamRepository(database=database)
         foo = Foo(count=1, size=1.0)
