@@ -3,7 +3,7 @@ coverage==7.0.5
 flake8==5.0.4
 phulpy==1.0.10
 pytest==7.2.1
-pytest-cov==4.0.0
+pytest-cov==4.1.0
 pytest-mock==3.11.1
 mongomock==4.1.2
 pydantic>=2.0.2
