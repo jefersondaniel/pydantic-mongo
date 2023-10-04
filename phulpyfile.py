@@ -14,13 +14,13 @@ def test(phulpy):
 def lint(phulpy):
     pydantic_mongo_dir = "pydantic_mongo"
     for cmd, message in (
-        (f"flake8 {pydantic_mongo_dir}", "lint test failed"),
+        (f"flake8 {pydantic_mongo_dir}", "please check flake8 errors"),
         (f"isort {pydantic_mongo_dir} --profile black --check", "please run isort!"),
         (f"black {pydantic_mongo_dir} --check", "please run black!"),
     ):
         result = system(cmd)
         if result:
-            raise Exception("lint test failed")
+            raise Exception(f"Lint failed: {message}")
 
 
 @task
