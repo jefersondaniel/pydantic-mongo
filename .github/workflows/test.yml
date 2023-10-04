@@ -19,9 +19,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements_test.txt
-    - name: Test & publish code coverage
+    - name: Test
+      run: |
+        phulpy test
+    - name: Publish code coverage
+      if: github.ref == 'refs/heads/main'
       uses: paambaati/codeclimate-action@v3.2.0
       env:
         CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-      with:
-        coverageCommand: phulpy test
