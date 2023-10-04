@@ -9,6 +9,6 @@ mongomock==4.1.2
 pydantic>=2.0.2
 pymongo==4.3.3
 mypy==0.991
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
 black==23.3.0
 isort==5.11.5
