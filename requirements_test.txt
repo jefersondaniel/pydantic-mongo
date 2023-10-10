@@ -7,7 +7,7 @@ pytest-cov==4.1.0
 pytest-mock==3.11.1
 mongomock==4.1.2
 pydantic>=2.0.2
-pymongo==4.3.3
+pymongo==4.5.0
 mypy==0.991
 mypy-extensions==1.0.0
 black==23.9.1
