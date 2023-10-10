@@ -2,7 +2,7 @@ mock
 coverage==7.0.5
 flake8==5.0.4
 phulpy==1.0.10
-pytest==7.2.1
+pytest==7.4.2
 pytest-cov==4.1.0
 pytest-mock==3.11.1
 mongomock==4.1.2
