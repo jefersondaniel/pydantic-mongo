@@ -132,13 +132,13 @@ class AbstractRepository(Generic[T]):
                 models_to_update.append(model)
             else:
                 models_to_insert.append(model)
+        if len(models_to_insert) > 0:
+            result = self.get_collection().insert_many(
+                (self.to_document(model) for model in models_to_insert)
+            )
 
-        result = self.get_collection().insert_many(
-            (self.to_document(model) for model in models_to_insert)
-        )
-
-        for idx, inserted_id in enumerate(result.inserted_ids):
-            models_to_insert[idx].id = inserted_id
+            for idx, inserted_id in enumerate(result.inserted_ids):
+                models_to_insert[idx].id = inserted_id
 
         if len(models_to_update) == 0:
             return
