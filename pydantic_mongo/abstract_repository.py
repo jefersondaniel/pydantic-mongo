@@ -15,7 +15,7 @@ from pydantic import BaseModel
 from pymongo import UpdateOne
 from pymongo.collection import Collection
 from pymongo.database import Database
-from pymongo.results import InsertOneResult, UpdateResult
+from pymongo.results import InsertOneResult, UpdateResult, DeleteResult, BulkWriteResult, InsertManyResult
 
 from .pagination import (
     Edge,
@@ -59,6 +59,14 @@ class AbstractRepository(Generic[T]):
             raise Exception("Document class should have id field")
         if not self.__collection_name:
             raise Exception("Meta should contain collection name")
+
+    @property
+    def document_count(self) -> int:
+        """
+        Get document count
+        :return: int
+        """
+        return self.get_collection().count_documents({})
 
     @staticmethod
     def to_document(model: T) -> dict:
@@ -120,7 +128,7 @@ class AbstractRepository(Generic[T]):
         model.id = result.inserted_id
         return result
 
-    def save_many(self, models: Iterable[T]):
+    def save_many(self, models: Iterable[T]) -> Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
         """
         Save multiple entities to database
         """
@@ -132,6 +140,7 @@ class AbstractRepository(Generic[T]):
                 models_to_update.append(model)
             else:
                 models_to_insert.append(model)
+        result = None
         if len(models_to_insert) > 0:
             result = self.get_collection().insert_many(
                 (self.to_document(model) for model in models_to_insert)
@@ -141,7 +150,7 @@ class AbstractRepository(Generic[T]):
                 models_to_insert[idx].id = inserted_id
 
         if len(models_to_update) == 0:
-            return
+            return None, result
 
         documents_to_update = [self.to_document(model) for model in models_to_update]
         mongo_ids = [doc.pop("_id") for doc in documents_to_update]
@@ -149,9 +158,19 @@ class AbstractRepository(Generic[T]):
             UpdateOne({"_id": mongo_id}, {"$set": document}, upsert=True)
             for mongo_id, document in zip(mongo_ids, documents_to_update)
         ]
-        self.get_collection().bulk_write(bulk_operations)
+        bw = self.get_collection().bulk_write(bulk_operations)
+        return bw, result
 
-    def delete(self, model: T):
+    def delete_many(self, models: Iterable[T]) -> DeleteResult | None:
+        """
+        Delete multiple entities from database
+        """
+        mongo_ids = [model.id for model in models]
+        if len(mongo_ids) == 0:
+            return None
+        return self.get_collection().delete_many({"_id": {"$in": mongo_ids}})
+
+    def delete(self, model: T) -> DeleteResult:
         return self.get_collection().delete_one({"_id": model.id})
 
     def find_one_by_id(self, _id: Any) -> Optional[T]:
@@ -170,13 +189,13 @@ class AbstractRepository(Generic[T]):
         return self.to_model(result) if result else None
 
     def find_by_with_output_type(
-        self,
-        output_type: Type[OutputT],
-        query: dict,
-        skip: Optional[int] = None,
-        limit: Optional[int] = None,
-        sort: Optional[Sort] = None,
-        projection: Optional[Dict[str, int]] = None,
+            self,
+            output_type: Type[OutputT],
+            query: dict,
+            skip: Optional[int] = None,
+            limit: Optional[int] = None,
+            sort: Optional[Sort] = None,
+            projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[OutputT]:
         """
         Find entities by mongo query allowing custom output type
@@ -200,12 +219,12 @@ class AbstractRepository(Generic[T]):
         return map(lambda doc: self.to_model_custom(output_type, doc), cursor)
 
     def find_by(
-        self,
-        query: dict,
-        skip: Optional[int] = None,
-        limit: Optional[int] = None,
-        sort: Optional[Sort] = None,
-        projection: Optional[Dict[str, int]] = None,
+            self,
+            query: dict,
+            skip: Optional[int] = None,
+            limit: Optional[int] = None,
+            sort: Optional[Sort] = None,
+            projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[T]:
         """ "
         Find entities by mongo query
@@ -220,11 +239,11 @@ class AbstractRepository(Generic[T]):
         )
 
     def get_pagination_query(
-        self,
-        query: dict,
-        after: Optional[str] = None,
-        before: Optional[str] = None,
-        sort: Optional[Sort] = None,
+            self,
+            query: dict,
+            after: Optional[str] = None,
+            before: Optional[str] = None,
+            sort: Optional[Sort] = None,
     ) -> dict:
         """
         Build pagination query based on the cursor and sort
@@ -251,14 +270,14 @@ class AbstractRepository(Generic[T]):
         return generated_query
 
     def paginate_with_output_type(
-        self,
-        output_type: Type[OutputT],
-        query: dict,
-        limit: int,
-        after: Optional[str] = None,
-        before: Optional[str] = None,
-        sort: Optional[Sort] = None,
-        projection: Optional[Dict[str, int]] = None,
+            self,
+            output_type: Type[OutputT],
+            query: dict,
+            limit: int,
+            after: Optional[str] = None,
+            before: Optional[str] = None,
+            sort: Optional[Sort] = None,
+            projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[Edge[OutputT]]:
         """
         Paginate entities by mongo query allowing custom output type
@@ -292,13 +311,13 @@ class AbstractRepository(Generic[T]):
         )
 
     def paginate(
-        self,
-        query: dict,
-        limit: int,
-        after: Optional[str] = None,
-        before: Optional[str] = None,
-        sort: Optional[Sort] = None,
-        projection: Optional[Dict[str, int]] = None,
+            self,
+            query: dict,
+            limit: int,
+            after: Optional[str] = None,
+            before: Optional[str] = None,
+            sort: Optional[Sort] = None,
+            projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[Edge[T]]:
         """
         Paginate entities by mongo query using cursor based pagination
