@@ -161,7 +161,7 @@ class AbstractRepository(Generic[T]):
         bw = self.get_collection().bulk_write(bulk_operations)
         return bw, result
 
-    def delete_many(self, models: Iterable[T]) -> DeleteResult | None:
+    def delete_many(self, models: Iterable[T]) -> Union[DeleteResult, None]:
         """
         Delete multiple entities from database
         """
