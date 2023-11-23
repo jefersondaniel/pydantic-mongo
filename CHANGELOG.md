@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.2...v2.0.3) (2023-11-23)
+
+
+### Bug Fixes
+
+* Fix `save_many()` when there are no models to insert ([#43](https://github.com/jefersondaniel/pydantic-mongo/issues/43)) ([6b0912d](https://github.com/jefersondaniel/pydantic-mongo/commit/6b0912de3a429c28991a8f2ae30b3147d0285d5b))
+
 ## [2.0.2](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.1...v2.0.2) (2023-09-13)
 
 
