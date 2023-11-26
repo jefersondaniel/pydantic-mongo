@@ -15,10 +15,12 @@ pip install pydantic-mongo
 ### Example Code
 
 ```python
+import os
 from pydantic import BaseModel
 from pydantic_mongo import AbstractRepository, ObjectIdField
 from pymongo import MongoClient
 from bson import ObjectId
+from typing import List
 
 class Foo(BaseModel):
    count: int
@@ -50,8 +52,14 @@ spam_repository.save(spam)
 # Insert / Update many items
 spam_repository.save_many([spam])
 
+# Get document count
+print(spam_repository.document_count)
+
 # Delete
 spam_repository.delete(spam)
+
+# Delete many items
+spam_repository.delete_many([spam])
 
 # Find One By Id
 result = spam_repository.find_one_by_id(spam.id)
