@@ -9,6 +9,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    Mapping,
 )
 
 from pydantic import BaseModel
@@ -97,7 +98,7 @@ class AbstractRepository(Generic[T]):
             result.append((key, ordering))
         return result
 
-    def to_model_custom(self, output_type: Type[OutputT], data: dict) -> OutputT:
+    def to_model_custom(self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]) -> OutputT:
         """
         Convert document to model with custom output type
         """
@@ -106,7 +107,7 @@ class AbstractRepository(Generic[T]):
             data_copy["id"] = data_copy.pop("_id")
         return output_type.model_validate(data_copy)
 
-    def to_model(self, data: dict) -> T:
+    def to_model(self, data: Union[dict, Mapping[str, Any]]) -> T:
         """
         Convert document to model
         """
