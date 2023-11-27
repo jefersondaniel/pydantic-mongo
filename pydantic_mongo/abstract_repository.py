@@ -46,11 +46,10 @@ class AbstractRepository(Generic[T]):
         self.__collection_name = self.Meta.collection_name
         self.__validate()
 
-    """
-    Get pymongo collection
-    """
-
     def get_collection(self) -> Collection:
+        """
+        Get pymongo collection
+        """
         return self.__database[self.__collection_name]
 
     def __validate(self):
@@ -73,7 +72,7 @@ class AbstractRepository(Generic[T]):
     def to_document(model: T) -> dict:
         """
         Convert model to document
-        :param model:
+        :param model: Model to convert
         :return: dict
         """
         data = model.model_dump()
@@ -116,22 +115,32 @@ class AbstractRepository(Generic[T]):
     def save(self, model: T, **kwargs) -> Union[InsertOneResult, UpdateResult]:
         """
         Save entity to database. It will update the entity if it has id, otherwise it will insert it.
+        :param model: Model to save
+        :param kwargs: kwargs for pymongo insert_one or update_one
+        :return: Union[InsertOneResult, UpdateResult]
         """
         document = self.to_document(model)
 
         if model.id:
             mongo_id = document.pop("_id")
-            return self.get_collection().update_one(
+            result = self.get_collection().update_one(
                 {"_id": mongo_id}, {"$set": document}, upsert=True, **kwargs
             )
+            if result.upserted_id:
+                model.id = result.upserted_id
+            return result
 
         result = self.get_collection().insert_one(document, **kwargs)
         model.id = result.inserted_id
         return result
 
-    def save_many(self, models: Iterable[T], **kwargs) -> Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
+    def save_many(self, models: Iterable[T], **kwargs) -> \
+            Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
         """
         Save multiple entities to database
+        :param models: Iterable of models to save
+        :param kwargs: kwargs for pymongo insert_many or bulk_write
+        :return: Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]
         """
         models_to_insert = []
         models_to_update = []
