@@ -170,6 +170,9 @@ class AbstractRepository(Generic[T]):
             for mongo_id, document in zip(mongo_ids, documents_to_update)
         ]
         bw = self.get_collection().bulk_write(bulk_operations, **kwargs)
+        if bw.upserted_ids:
+            for idx, inserted_id in enumerate(bw.upserted_ids.values()):
+                models_to_update[idx].id = inserted_id
         return bw, result
 
     def delete_many(self, models: Iterable[T], **kwargs) -> Union[DeleteResult, None]:
