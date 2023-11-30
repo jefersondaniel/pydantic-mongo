@@ -71,6 +71,8 @@ class AbstractRepository(Generic[T]):
         data.pop("id")
         if model.id:
             data["_id"] = model.id
+        if model.v:
+            data["__v"] = model.v
         return data
 
     def __map_id(self, data: dict) -> dict:
