@@ -347,3 +347,13 @@ class AbstractRepository(Generic[T]):
             sort=sort,
             projection=projection,
         )
+
+    def paginate_simple(self, query: dict, limit: int = 25, page: int = 1, **kwargs):
+        """
+        Paginate entities by mongo query using simple pagination
+        """
+        if page <= 0:
+            page = 1
+        skip = (page - 1) * limit
+        return [x for x in self.find_by(query, skip=skip, limit=limit, **kwargs)]
+
