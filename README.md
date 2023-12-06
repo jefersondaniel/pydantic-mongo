@@ -27,8 +27,8 @@ class Foo(BaseModel):
    size: float = None
 
 class Bar(BaseModel):
-   apple = 'x'
-   banana = 'y'
+   apple: str = 'x'
+   banana: str = 'y'
 
 class Spam(BaseModel):
    id: ObjectIdField = None
@@ -73,8 +73,14 @@ result = spam_repository.find_one_by({'foo.count': 1})
 # Find By Query
 results = spam_repository.find_by({'foo.count': {'$gte': 1}})
 
+# Find and sort
+results = spam_repository.find_by({'foo.count': {'$gte': 1}}, sort=[('foo.count', -1)])
+
 # Paginate using cursor based pagination
 edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1)
 more_edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1, after=edges[-1].cursor)
 last_model = more_edges[-1].node
+
+# Simple pagination
+edges = spam_repository.paginate_simple({'foo.count': {'$gte': 1}}, limit=25, page=1)
 ```
