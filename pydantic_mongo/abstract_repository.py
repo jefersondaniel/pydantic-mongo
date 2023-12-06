@@ -86,7 +86,7 @@ class AbstractRepository(Generic[T]):
         :param model: Model to convert
         :return: dict
         """
-        data = model.model_dump()
+        data = model.model_dump(mode='json')
         data.pop("id")
         if model.id:
             data["_id"] = model.id
@@ -410,7 +410,7 @@ class AsyncAbstractRepository(Generic[T]):
         :param model: Model to convert
         :return: dict
         """
-        data = model.model_dump()
+        data = model.model_dump(mode='json')
         data.pop("id")
         if model.id:
             data["_id"] = model.id
