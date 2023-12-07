@@ -102,8 +102,12 @@ class AbstractRepository(Generic[T]):
     def __map_sort(self, sort: Sort) -> str | list[tuple] | list[tuple[str | Any, Any]]:
         result = []
         if isinstance(sort, str):
+            if sort == "id":
+                sort = "_id"
             return sort
         elif isinstance(sort, tuple):
+            if sort[0] == "id":
+                sort = ("_id", sort[1])
             return [sort]
         elif isinstance(sort, list):
             for item in sort:
@@ -112,6 +116,8 @@ class AbstractRepository(Generic[T]):
                 if key == "id":
                     key = "_id"
                 result.append((key, ordering))
+        else:
+            raise Exception("Sort should be str, tuple or list of tuples")
         return result
 
     def to_model_custom(self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]) -> OutputT:
@@ -431,8 +437,12 @@ class AsyncAbstractRepository(Generic[T]):
     def __map_sort(self, sort: Sort) -> str | list[tuple] | list[tuple[str | Any, Any]]:
         result = []
         if isinstance(sort, str):
+            if sort == "id":
+                sort = "_id"
             return sort
         elif isinstance(sort, tuple):
+            if sort[0] == "id":
+                sort = ("_id", sort[1])
             return [sort]
         elif isinstance(sort, list):
             for item in sort:
@@ -441,6 +451,8 @@ class AsyncAbstractRepository(Generic[T]):
                 if key == "id":
                     key = "_id"
                 result.append((key, ordering))
+        else:
+            raise Exception("Sort should be str, tuple or list of tuples")
         return result
 
     def to_model_custom(self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]) -> OutputT:
