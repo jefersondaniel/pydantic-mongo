@@ -1,5 +1,5 @@
 mock
-coverage==7.3.2
+coverage==7.4.0
 flake8==6.1.0
 phulpy==1.0.10
 pytest==7.4.3
