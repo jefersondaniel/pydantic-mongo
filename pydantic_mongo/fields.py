@@ -4,7 +4,7 @@ from bson import ObjectId
 from pydantic_core import core_schema
 
 
-class ObjectIdField(str):
+class ObjectIdField(ObjectId):
     @classmethod
     def __get_pydantic_core_schema__(
         cls, _source_type: Any, _handler: Any
