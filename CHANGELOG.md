@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.3...v2.1.0) (2024-01-05)
+
+
+### Features
+
+* Create an empty py.typed file to add mypy type hint support  ([#61](https://github.com/jefersondaniel/pydantic-mongo/issues/61)) ([10e58de](https://github.com/jefersondaniel/pydantic-mongo/commit/10e58de6ac52e45a56b88cff586151359c219b43))
+
+
+### Bug Fixes
+
+* Fix README code snippets ([#65](https://github.com/jefersondaniel/pydantic-mongo/issues/65)) ([dac1347](https://github.com/jefersondaniel/pydantic-mongo/commit/dac1347229d876b9a3de525f8566bbfc0c0c62bd))
+
 ## [2.0.3](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.2...v2.0.3) (2023-11-23)
 
 
