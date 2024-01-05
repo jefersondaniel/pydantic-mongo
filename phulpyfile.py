@@ -38,6 +38,13 @@ def unit_test(phulpy):
 
 
 @task
+def integration_test(phulpy):
+    result = system("pytest integration_test")
+    if result:
+        raise Exception("Integration tests failed")
+
+
+@task
 def typecheck(phulpy):
     result = system(
         r'find ./pydantic_mongo -name "*.py" -exec mypy --ignore-missing-imports --follow-imports=skip --strict-optional {} \+'
