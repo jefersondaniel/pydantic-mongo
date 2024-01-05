@@ -64,8 +64,11 @@ spam_repository.delete(spam)
 # Find One By Id
 result = spam_repository.find_one_by_id(spam.id)
 
-# Find One By Id using string if the id attribute is a ObjectIdField
+# Find One By Id using string or objectid if the id attribute is a ObjectIdField
 result = spam_repository.find_one_by_id(ObjectId('611827f2878b88b49ebb69fc'))
+assert result.foo.count == 2
+
+result = spam_repository.find_one_by_id('611827f2878b88b49ebb69fc')
 assert result.foo.count == 2
 
 # Find One By Query
