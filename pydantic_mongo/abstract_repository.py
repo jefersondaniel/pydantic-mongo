@@ -1,3 +1,4 @@
+import asyncio
 from typing import (
     Any,
     Dict,
@@ -10,20 +11,17 @@ from typing import (
     TypeVar,
     Union,
     Mapping,
-    List,
 )
 
-import asyncio
-
+import nest_asyncio
 from bson import ObjectId
+from motor import motor_asyncio
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pydantic import BaseModel
 from pymongo import UpdateOne
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.results import InsertOneResult, UpdateResult, DeleteResult, BulkWriteResult, InsertManyResult
-
-from motor import motor_asyncio
 
 from .pagination import (
     Edge,
@@ -32,7 +30,6 @@ from .pagination import (
     get_pagination_cursor_payload,
 )
 
-import nest_asyncio
 nest_asyncio.apply()
 
 T = TypeVar("T", bound=BaseModel)
