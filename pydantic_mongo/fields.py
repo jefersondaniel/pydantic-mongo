@@ -9,10 +9,6 @@ from pydantic_core import core_schema
 class ObjectIdField(ObjectId):
 
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
     def __get_pydantic_json_schema__(
         cls, _core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
     ) -> JsonSchemaValue:
