@@ -30,7 +30,7 @@ def lint(phulpy):
 def unit_test(phulpy):
     result = system(
         "pytest --cov-report term-missing"
-        + " --cov-report xml --cov=pydantic_mongo test"
+        " --cov-report xml --cov=pydantic_mongo test"
     )
     if result:
         raise Exception("Unit tests failed")

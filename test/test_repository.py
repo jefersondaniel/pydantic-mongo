@@ -118,6 +118,37 @@ class TestRepository:
         result = spam_repository.find_one_by_id(spam.id)
         assert result is None
 
+    def test_delete_many(self, database):
+        spam_repository = SpamRepository(database=database)
+        foo = Foo(count=1, size=1.0)
+        bar = Bar()
+        spam = Spam(foo=foo, bars=[bar])
+        spam_repository.save(spam)
+
+        result = spam_repository.find_one_by_id(spam.id)
+        assert result is not None
+
+        spam_repository.delete_many([spam])
+        result = spam_repository.find_one_by_id(spam.id)
+        assert result is None
+
+        spam_repository.delete_many([])
+        result = spam_repository.find_one_by_id(spam.id)
+        assert result is None
+
+    def test_paginate_simple(self, database):
+        spam_repository = SpamRepository(database=database)
+        foo = Foo(count=1, size=1.0)
+        bar = Bar()
+        spam = Spam(foo=foo, bars=[bar])
+        spam_repository.save(spam)
+
+        result = spam_repository.paginate_simple({}, limit=10)
+        assert 1 == len([x for x in result])
+
+        result = spam_repository.paginate_simple({}, page=0, limit=10)
+        assert 1 == len([x for x in result])
+
     def test_find_by_id(self, database):
         spam_id = ObjectId("611827f2878b88b49ebb69fc")
         database.spams.insert_one(
@@ -164,6 +195,20 @@ class TestRepository:
         )
         results = [x for x in result]
         assert 0 == len(results)
+
+    def test_sort(self, database):
+        spam_repository = SpamRepository(database=database)
+        result = spam_repository.find_by({}, sort="id")
+        assert 0 == len([x for x in result])
+
+        result = spam_repository.find_by({}, sort=[("id", 1)])
+        assert 0 == len([x for x in result])
+
+        result = spam_repository.find_by({}, sort=("id", 1))
+        assert 0 == len([x for x in result])
+
+        with pytest.raises(Exception):
+            spam_repository.find_by({}, sort=object())
 
     def test_invalid_model_class(self, database):
         class BrokenRepository(AbstractRepository[int]):
@@ -247,3 +292,14 @@ class TestRepository:
 
         with pytest.raises(PaginationError):
             spam_repository.paginate({}, limit=10, after="invalid string")
+
+    def test_document_count(self, database):
+        spam_repository = SpamRepository(database=database)
+        foo = Foo(count=1, size=1.0)
+
+        spam = Spam(foo=foo)
+
+        spam_repository.save(spam)
+
+        assert 1 == spam_repository.document_count
+
