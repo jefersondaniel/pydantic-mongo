@@ -101,7 +101,7 @@ class AbstractRepository(Generic[T]):
             query["_id"] = query.pop("id")
         return query
 
-    def __map_sort(self, sort: Sort) -> str | List[tuple] | List[Tuple[str | Any, Any]]:
+    def __map_sort(self, sort: Sort) -> Union[str, List[tuple], List[Tuple[str, Any]]]:
         result = []
         if isinstance(sort, str):
             if sort == "id":
@@ -436,7 +436,7 @@ class AsyncAbstractRepository(Generic[T]):
             query["_id"] = query.pop("id")
         return query
 
-    def __map_sort(self, sort: Sort) -> str | list[tuple] | list[tuple[str | Any, Any]]:
+    def __map_sort(self, sort: Sort) -> Union[str, List[tuple], List[Tuple[str, Any]]]:
         result = []
         if isinstance(sort, str):
             if sort == "id":
