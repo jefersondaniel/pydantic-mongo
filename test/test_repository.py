@@ -61,9 +61,7 @@ class TestRepository:
     def test_save_upsert(self, database):
         spam_repository = SpamRepository(database=database)
         spam = Spam(
-            id=ObjectId("65012da68ea5a4798502f710"),
-            foo=Foo(count=1, size=1.0),
-            bars=[]
+            id=ObjectId("65012da68ea5a4798502f710"), foo=Foo(count=1, size=1.0), bars=[]
         )
         spam_repository.save(spam)
 

@@ -88,7 +88,7 @@ class AbstractRepository(Generic[T]):
         :param model: Model to convert
         :return: dict
         """
-        data = model.model_dump(mode='json')
+        data = model.model_dump(mode="json")
         data.pop("id")
         if model.id:
             data["_id"] = model.id
@@ -121,7 +121,9 @@ class AbstractRepository(Generic[T]):
             raise Exception("Sort should be str, tuple or list of tuples")
         return result
 
-    def to_model_custom(self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]) -> OutputT:
+    def to_model_custom(
+        self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]
+    ) -> OutputT:
         """
         Convert document to model with custom output type
         """
@@ -158,8 +160,9 @@ class AbstractRepository(Generic[T]):
         model.id = result.inserted_id
         return result
 
-    def save_many(self, models: Iterable[T], **kwargs) -> \
-            Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
+    def save_many(
+        self, models: Iterable[T], **kwargs
+    ) -> Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
         """
         Save multiple entities to database
         :param models: Iterable of models to save
@@ -177,8 +180,7 @@ class AbstractRepository(Generic[T]):
         result = None
         if len(models_to_insert) > 0:
             result = self.get_collection().insert_many(
-                (self.to_document(model) for model in models_to_insert),
-                **kwargs
+                (self.to_document(model) for model in models_to_insert), **kwargs
             )
 
             for idx, inserted_id in enumerate(result.inserted_ids):
@@ -421,7 +423,7 @@ class AsyncAbstractRepository(Generic[T]):
         :param model: Model to convert
         :return: dict
         """
-        data = model.model_dump(mode='json')
+        data = model.model_dump(mode="json")
         data.pop("id")
         if model.id:
             data["_id"] = model.id
@@ -454,7 +456,9 @@ class AsyncAbstractRepository(Generic[T]):
             raise Exception("Sort should be str, tuple or list of tuples")
         return result
 
-    def to_model_custom(self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]) -> OutputT:
+    def to_model_custom(
+        self, output_type: Type[OutputT], data: Union[dict, Mapping[str, Any]]
+    ) -> OutputT:
         """
         Convert document to model with custom output type
         """
@@ -469,7 +473,9 @@ class AsyncAbstractRepository(Generic[T]):
         """
         return self.__database[self.__collection_name]
 
-    async def find_one_by_id(self, _id: Union[ObjectId, str], *args, **kwargs) -> Optional[T]:
+    async def find_one_by_id(
+        self, _id: Union[ObjectId, str], *args, **kwargs
+    ) -> Optional[T]:
         """
         Find entity by id
 
@@ -481,7 +487,9 @@ class AsyncAbstractRepository(Generic[T]):
         """
         Find entity by mongo query
         """
-        result = await self.get_collection().find_one(self.__map_id(query), *args, **kwargs)
+        result = await self.get_collection().find_one(
+            self.__map_id(query), *args, **kwargs
+        )
         return self.to_model(result) if result else None
 
     async def find_by_with_output_type(
@@ -512,7 +520,10 @@ class AsyncAbstractRepository(Generic[T]):
             cursor.skip(skip)
         if sort:
             cursor.sort(mapped_sort)
-        return map(lambda doc: self.to_model_custom(output_type, doc), await cursor.to_list(limit))
+        return map(
+            lambda doc: self.to_model_custom(output_type, doc),
+            await cursor.to_list(limit),
+        )
 
     async def find_by(
         self,
@@ -534,7 +545,9 @@ class AsyncAbstractRepository(Generic[T]):
             projection=projection,
         )
 
-    async def paginate_simple(self, query: dict, limit: int = 25, page: int = 1, **kwargs):
+    async def paginate_simple(
+        self, query: dict, limit: int = 25, page: int = 1, **kwargs
+    ):
         """
         Paginate entities by mongo query using simple pagination
         :param query:
@@ -570,8 +583,9 @@ class AsyncAbstractRepository(Generic[T]):
         model.id = result.inserted_id
         return result
 
-    async def save_many(self, models: Iterable[T], **kwargs) -> \
-            Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
+    async def save_many(
+        self, models: Iterable[T], **kwargs
+    ) -> Union[Tuple[BulkWriteResult, None], Tuple[None, InsertManyResult]]:
         """
         Save multiple entities to database
         :param models: Iterable of models to save
@@ -589,8 +603,7 @@ class AsyncAbstractRepository(Generic[T]):
         result = None
         if len(models_to_insert) > 0:
             result = await self.get_collection().insert_many(
-                (self.to_document(model) for model in models_to_insert),
-                **kwargs
+                (self.to_document(model) for model in models_to_insert), **kwargs
             )
 
             for idx, inserted_id in enumerate(result.inserted_ids):
@@ -611,14 +624,18 @@ class AsyncAbstractRepository(Generic[T]):
                 models_to_update[idx].id = inserted_id
         return bw, result
 
-    async def delete_many(self, models: Iterable[T], **kwargs) -> Union[DeleteResult, None]:
+    async def delete_many(
+        self, models: Iterable[T], **kwargs
+    ) -> Union[DeleteResult, None]:
         """
         Delete multiple entities from database
         """
         mongo_ids = [model.id for model in models]
         if len(mongo_ids) == 0:
             return None
-        return await self.get_collection().delete_many({"_id": {"$in": mongo_ids}}, **kwargs)
+        return await self.get_collection().delete_many(
+            {"_id": {"$in": mongo_ids}}, **kwargs
+        )
 
     async def delete(self, model: T, **kwargs) -> DeleteResult:
         """

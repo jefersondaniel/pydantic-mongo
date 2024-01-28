@@ -6,9 +6,10 @@ import sys
 
 # This test isn't really nessessary
 
+
 def extract_python_snippets(content):
     # Regular expression pattern for finding Python code blocks
-    pattern = r'```python(.*?)```'
+    pattern = r"```python(.*?)```"
     snippets = re.findall(pattern, content, re.DOTALL)
     return snippets
 
