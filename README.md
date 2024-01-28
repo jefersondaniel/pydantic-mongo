@@ -23,21 +23,21 @@ from bson import ObjectId
 from typing import List
 
 class Foo(BaseModel):
-   count: int
-   size: float = None
+    count: int
+    size: float = None
 
 class Bar(BaseModel):
-   apple: str = 'x'
-   banana: str = 'y'
+    apple: str = 'x'
+    banana: str = 'y'
 
 class Spam(BaseModel):
-   id: ObjectIdField = None
-   foo: Foo
-   bars: List[Bar]
+    id: ObjectIdField = None
+    foo: Foo
+    bars: List[Bar]
 
 class SpamRepository(AbstractRepository[Spam]):
-   class Meta:
-      collection_name = 'spams'
+    class Meta:
+        collection_name = 'spams'
 
 client = MongoClient(os.environ["MONGODB_URL"])
 database = client[os.environ["MONGODB_DATABASE"]]
