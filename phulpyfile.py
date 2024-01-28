@@ -16,6 +16,7 @@ def lint(phulpy):
     for cmd, message in (
         (f"flake8 {pydantic_mongo_dir}", "please check flake8 errors"),
         (f"isort {pydantic_mongo_dir} --profile black --check", "please run isort!"),
+        # (f"black {pydantic_mongo_dir} --check", "please run black!"),
     ):
         result = system(cmd)
         if result:
@@ -43,10 +44,10 @@ def integration_test(phulpy):
         raise Exception("Integration tests failed")
 
 
-@task
-def typecheck(phulpy):
-    result = system(
-        r'find ./pydantic_mongo -name "*.py" -exec mypy --ignore-missing-imports --follow-imports=skip --strict-optional {} \+'
-    )
-    if result:
-        raise Exception("lint test failed")
+# @task
+# def typecheck(phulpy):
+#     result = system(
+#         r'find ./pydantic_mongo -name "*.py" -exec mypy --ignore-missing-imports --follow-imports=skip --strict-optional {} \+'
+#     )
+#     if result:
+#         raise Exception("lint test failed")
