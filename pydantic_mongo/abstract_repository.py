@@ -4,13 +4,13 @@ from typing import (
     Dict,
     Generic,
     Iterable,
+    Mapping,
     Optional,
     Sequence,
     Tuple,
     Type,
     TypeVar,
     Union,
-    Mapping,
 )
 
 import nest_asyncio
@@ -21,7 +21,13 @@ from pydantic import BaseModel
 from pymongo import UpdateOne
 from pymongo.collection import Collection
 from pymongo.database import Database
-from pymongo.results import InsertOneResult, UpdateResult, DeleteResult, BulkWriteResult, InsertManyResult
+from pymongo.results import (
+    BulkWriteResult,
+    DeleteResult,
+    InsertManyResult,
+    InsertOneResult,
+    UpdateResult,
+)
 
 from .pagination import (
     Edge,
