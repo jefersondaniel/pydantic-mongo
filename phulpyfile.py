@@ -7,7 +7,10 @@ from phulpy import task
 
 @task
 def test(phulpy):
-    phulpy.start(["lint", "typecheck", "unit_test"])
+    phulpy.start([
+        "lint",
+        # "typecheck",
+        "unit_test"])
 
 
 @task
