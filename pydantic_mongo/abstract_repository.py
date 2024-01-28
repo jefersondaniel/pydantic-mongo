@@ -69,8 +69,6 @@ class AbstractRepository(Generic[T]):
             raise Exception("Document class should have id field")
         if not self.__collection_name:
             raise Exception("Meta should contain collection name")
-        if not isinstance(self.__database, Database):
-            raise Exception("Database should be a pymongo Database object")
 
     @property
     def document_count(self) -> int:
@@ -412,8 +410,6 @@ class AsyncAbstractRepository(Generic[T]):
             raise Exception("Document class should have id field")
         if not self.__collection_name:
             raise Exception("Meta should contain collection name")
-        if not isinstance(self.__database, AsyncIOMotorDatabase):
-            raise Exception("Database should be AsyncIOMotorDatabase")
 
     @staticmethod
     def to_document(model: T) -> dict:
