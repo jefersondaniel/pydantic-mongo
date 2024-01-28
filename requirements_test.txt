@@ -12,5 +12,6 @@ mypy==1.8.0
 mypy-extensions==1.0.0
 black==23.12.1
 isort==5.13.2
+nest-asyncio
 motor
 asyncio
