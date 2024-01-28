@@ -4,13 +4,14 @@ from typing import (
     Dict,
     Generic,
     Iterable,
+    List,
     Mapping,
     Optional,
     Sequence,
     Tuple,
     Type,
     TypeVar,
-    Union, List,
+    Union,
 )
 
 import nest_asyncio
