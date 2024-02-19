@@ -1,6 +1,6 @@
 mock
 setuptools==69.0.3
-coverage==7.4.0
+coverage==7.4.1
 flake8==6.1.0
 phulpy==1.0.10
 pytest==7.4.3
