@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.1](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.1.0...v2.1.1) (2024-03-01)
+
+
+### Bug Fixes
+
+* Fix export ([#73](https://github.com/jefersondaniel/pydantic-mongo/issues/73)) ([564df68](https://github.com/jefersondaniel/pydantic-mongo/commit/564df68f43c7955eadb412fd8bdb8474ea25ccd7))
+* Remove unecessary entry point setting ([#82](https://github.com/jefersondaniel/pydantic-mongo/issues/82)) ([bb02aff](https://github.com/jefersondaniel/pydantic-mongo/commit/bb02affb68161f4da811a34fe47c029fa4918a21))
+
 ## [2.1.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.0.3...v2.1.0) (2024-01-05)
 
 
