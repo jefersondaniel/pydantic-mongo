@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.1.1...v2.1.2) (2024-03-06)
+
+
+### Bug Fixes
+
+* Fix JSON Schema for ObjectIdField ([#86](https://github.com/jefersondaniel/pydantic-mongo/issues/86)) ([7bb1c2e](https://github.com/jefersondaniel/pydantic-mongo/commit/7bb1c2e31034a7fa8ba216ae1176b2e74cdeef70))
+
 ## [2.1.1](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.1.0...v2.1.1) (2024-03-01)
 
 
