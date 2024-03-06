@@ -16,7 +16,7 @@ class ObjectIdField(ObjectId):
             ]
         )
         return core_schema.json_or_python_schema(
-            json_schema=object_id_schema,
+            json_schema=core_schema.str_schema(),
             python_schema=core_schema.union_schema(
                 [core_schema.is_instance_schema(ObjectId), object_id_schema]
             ),
