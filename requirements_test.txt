@@ -9,7 +9,7 @@ pytest-mock==3.12.0
 mongomock==4.1.2
 pydantic>=2.0.2
 pymongo==4.6.2
-mypy==1.8.0
+mypy==1.9.0
 mypy-extensions==1.0.0
 black==24.2.0
 isort==5.13.2
