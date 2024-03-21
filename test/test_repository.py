@@ -120,6 +120,20 @@ class TestRepository:
         result = spam_repository.find_one_by_id(spam.id)
         assert result is None
 
+    def test_delete_by_id(self, database):
+        spam_repository = SpamRepository(database=database)
+        foo = Foo(count=1, size=1.0)
+        bar = Bar()
+        spam = Spam(foo=foo, bars=[bar])
+        spam_repository.save(spam)
+
+        result = spam_repository.find_one_by_id(spam.id)
+        assert result is not None
+
+        spam_repository.delete_by_id(spam.id)
+        result = spam_repository.find_one_by_id(spam.id)
+        assert result is None
+
     def test_find_by_id(self, database):
         spam_id = ObjectId("611827f2878b88b49ebb69fc")
         database.spams.insert_one(
