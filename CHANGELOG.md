@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.1.2...v2.2.0) (2024-04-11)
+
+
+### Features
+
+* add delete_by_id to AbstractRepository ([#96](https://github.com/jefersondaniel/pydantic-mongo/issues/96)) ([26a6fbe](https://github.com/jefersondaniel/pydantic-mongo/commit/26a6fbe7c9f7bba1e6708d9e19831c59e6e93fac))
+
 ## [2.1.2](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.1.1...v2.1.2) (2024-03-06)
 
 
