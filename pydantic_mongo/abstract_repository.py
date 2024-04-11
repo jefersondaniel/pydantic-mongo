@@ -154,6 +154,9 @@ class AbstractRepository(Generic[T]):
     def delete(self, model: T):
         return self.get_collection().delete_one({"_id": model.id})
 
+    def delete_by_id(self, _id: Any):
+        return self.get_collection().delete_one({"_id": _id})
+
     def find_one_by_id(self, _id: Any) -> Optional[T]:
         """
         Find entity by id
