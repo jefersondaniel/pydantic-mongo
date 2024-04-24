@@ -3,6 +3,7 @@ import io
 import os
 import re
 
+
 def extract_python_snippets(content):
     # Regular expression pattern for finding Python code blocks
     pattern = r'```python(.*?)```'

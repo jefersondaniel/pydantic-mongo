@@ -1,5 +1,4 @@
-import datetime
-from typing import List
+from typing import List, Optional
 
 from bson import ObjectId
 from pydantic import BaseModel
@@ -13,7 +12,7 @@ from pydantic_mongo.pagination import (
 
 class Foo(BaseModel):
     count: int
-    size: float = None
+    size: Optional[float] = None
 
 
 class Bar(BaseModel):
@@ -22,7 +21,7 @@ class Bar(BaseModel):
 
 
 class Spam(BaseModel):
-    id: str = None
+    id: Optional[str] = None
     foo: Foo
     bars: List[Bar]
 

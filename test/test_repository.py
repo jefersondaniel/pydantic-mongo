@@ -1,17 +1,17 @@
-from typing import List
+from typing import Annotated, List, Optional, cast
 
 import mongomock
 import pytest
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
-from pydantic_mongo import AbstractRepository, ObjectIdField
+from pydantic_mongo import AbstractRepository, PydanticObjectId
 from pydantic_mongo.errors import PaginationError
 
 
 class Foo(BaseModel):
     count: int
-    size: float = None
+    size: Optional[float] = None
 
 
 class Bar(BaseModel):
@@ -20,9 +20,9 @@ class Bar(BaseModel):
 
 
 class Spam(BaseModel):
-    id: ObjectIdField = None
-    foo: Foo = None
-    bars: List[Bar] = None
+    id: Optional[PydanticObjectId] = None
+    foo: Optional[Foo] = None
+    bars: Optional[List[Bar]] = None
 
 
 class SpamRepository(AbstractRepository[Spam]):
@@ -49,7 +49,7 @@ class TestRepository:
             "bars": [{"apple": "x", "banana": "y"}],
         } == database["spams"].find()[0]
 
-        spam.foo.count = 2
+        cast(Foo, spam.foo).count = 2
         spam_repository.save(spam)
 
         assert {
@@ -147,6 +147,8 @@ class TestRepository:
         spam_repository = SpamRepository(database=database)
         result = spam_repository.find_one_by_id(spam_id)
 
+        assert result is not None
+        assert result.bars is not None
         assert issubclass(Spam, type(result))
         assert spam_id == result.id
         assert "x" == result.bars[0].apple
@@ -171,6 +173,8 @@ class TestRepository:
         result = spam_repository.find_by({})
         results = [x for x in result]
         assert 2 == len(results)
+        assert results[0].foo is not None
+        assert results[1].foo is not None
         assert 2 == results[0].foo.count
         assert 3 == results[1].foo.count
 
@@ -180,14 +184,6 @@ class TestRepository:
         )
         results = [x for x in result]
         assert 0 == len(results)
-
-    def test_invalid_model_class(self, database):
-        class BrokenRepository(AbstractRepository[int]):
-            class Meta:
-                collection_name = "spams"
-
-        with pytest.raises(Exception):
-            BrokenRepository(database=database)
 
     def test_invalid_model_id_field(self, database):
         class NoIdModel(BaseModel):

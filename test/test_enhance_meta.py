@@ -1,11 +1,11 @@
 import pytest
 from pydantic import BaseModel, Field
-
-from pydantic_mongo import AbstractRepository, ObjectIdField
+from pydantic_mongo import AbstractRepository, PydanticObjectId
+from typing_extensions import Optional
 
 
 class HamModel(BaseModel):
-    id: ObjectIdField = Field(default=None)
+    id: Optional[PydanticObjectId]
     name: str
 
 
@@ -31,7 +31,7 @@ def test_repository_with_v2_meta(ham_repo):
 
 
 def test_save_with_new_repo(clean_ham_collection, ham_repo):
-    m = HamModel(name="wilfred")
+    m = HamModel(id=None, name="wilfred")
     assert m.id is None, "should have no id"
     ham_repo.save(m)
     assert m.id

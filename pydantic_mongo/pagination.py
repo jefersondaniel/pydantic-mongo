@@ -16,7 +16,7 @@ class Edge(BaseModel, Generic[DataT]):
 
 
 def encode_pagination_cursor(data: List) -> str:
-    byte_data = bson.BSON.encode({"v": data})
+    byte_data: bytes = bson.BSON.encode({"v": data})
     byte_data = zlib.compress(byte_data, 9)
     return b64encode(byte_data).decode("utf-8")
 
