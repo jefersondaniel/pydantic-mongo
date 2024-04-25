@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.2.0...v2.3.0) (2024-04-25)
+
+
+### Features
+
+* Improve type checking support ([#103](https://github.com/jefersondaniel/pydantic-mongo/issues/103)) ([d8bb03a](https://github.com/jefersondaniel/pydantic-mongo/commit/d8bb03a9ad0c75a722a0cf92252fc461642adcc1))
+
 ## [2.2.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.1.2...v2.2.0) (2024-04-11)
 
 
