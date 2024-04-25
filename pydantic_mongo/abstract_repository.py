@@ -121,7 +121,7 @@ class AbstractRepository(Generic[T]):
             )
 
         result = self.get_collection().insert_one(document)
-        model.id = result.inserted_id
+        model_with_id.id = result.inserted_id
         return result
 
     def save_many(self, models: Iterable[T]):
@@ -143,7 +143,7 @@ class AbstractRepository(Generic[T]):
             )
 
             for idx, inserted_id in enumerate(result.inserted_ids):
-                models_to_insert[idx].id = inserted_id
+                cast(ModelWithId, models_to_insert[idx]).id = inserted_id
 
         if len(models_to_update) == 0:
             return
