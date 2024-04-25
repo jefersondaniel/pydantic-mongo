@@ -1,4 +1,4 @@
-from typing import Annotated, List, Optional, cast
+from typing import List, Optional, cast
 
 import mongomock
 import pytest
