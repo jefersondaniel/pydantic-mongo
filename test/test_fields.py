@@ -1,4 +1,5 @@
 import pytest
+from typing import Optional
 from bson import ObjectId
 from pydantic import BaseModel, ValidationError
 
@@ -6,7 +7,7 @@ from pydantic_mongo import ObjectIdField
 
 
 class User(BaseModel):
-    id: ObjectIdField = None
+    id: ObjectIdField
 
 
 class TestFields:
@@ -26,5 +27,6 @@ class TestFields:
         assert {
             "title": "User",
             "type": "object",
-            "properties": {"id": {"default": None, "title": "Id", "type": "string"}},
+            "properties": {"id": {"title": "Id", "type": "string"}},
+            "required": ["id"],
         } == schema

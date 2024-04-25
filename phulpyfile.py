@@ -46,8 +46,6 @@ def integration_test(phulpy):
 
 @task
 def typecheck(phulpy):
-    result = system(
-        r'find ./pydantic_mongo -name "*.py" -exec mypy --ignore-missing-imports --follow-imports=skip --strict-optional {} \+'
-    )
+    result = system('mypy pydantic_mongo test --check-untyped-defs')
     if result:
         raise Exception("lint test failed")

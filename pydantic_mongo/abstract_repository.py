@@ -9,6 +9,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
 )
 
 from pydantic import BaseModel
@@ -26,8 +27,11 @@ from .pagination import (
 
 T = TypeVar("T", bound=BaseModel)
 OutputT = TypeVar("OutputT", bound=BaseModel)
-
 Sort = Sequence[Tuple[str, int]]
+
+
+class ModelWithId(BaseModel):
+    id: Any
 
 
 class AbstractRepository(Generic[T]):
@@ -53,8 +57,6 @@ class AbstractRepository(Generic[T]):
         return self.__database[self.__collection_name]
 
     def __validate(self):
-        if not issubclass(self.__document_class, BaseModel):
-            raise Exception("Document class should inherit BaseModel")
         if "id" not in self.__document_class.model_fields:
             raise Exception("Document class should have id field")
         if not self.__collection_name:
@@ -67,10 +69,11 @@ class AbstractRepository(Generic[T]):
         :param model:
         :return: dict
         """
-        data = model.model_dump()
+        model_with_id = cast(ModelWithId, model)
+        data = model_with_id.model_dump()
         data.pop("id")
-        if model.id:
-            data["_id"] = model.id
+        if model_with_id.id:
+            data["_id"] = model_with_id.id
         return data
 
     def __map_id(self, data: dict) -> dict:
@@ -109,15 +112,16 @@ class AbstractRepository(Generic[T]):
         Save entity to database. It will update the entity if it has id, otherwise it will insert it.
         """
         document = self.to_document(model)
+        model_with_id = cast(ModelWithId, model)
 
-        if model.id:
+        if model_with_id.id:
             mongo_id = document.pop("_id")
             return self.get_collection().update_one(
                 {"_id": mongo_id}, {"$set": document}, upsert=True
             )
 
         result = self.get_collection().insert_one(document)
-        model.id = result.inserted_id
+        model_with_id.id = result.inserted_id
         return result
 
     def save_many(self, models: Iterable[T]):
@@ -128,7 +132,8 @@ class AbstractRepository(Generic[T]):
         models_to_update = []
 
         for model in models:
-            if model.id:
+            model_with_id = cast(ModelWithId, model)
+            if model_with_id.id:
                 models_to_update.append(model)
             else:
                 models_to_insert.append(model)
@@ -138,7 +143,7 @@ class AbstractRepository(Generic[T]):
             )
 
             for idx, inserted_id in enumerate(result.inserted_ids):
-                models_to_insert[idx].id = inserted_id
+                cast(ModelWithId, models_to_insert[idx]).id = inserted_id
 
         if len(models_to_update) == 0:
             return
@@ -152,7 +157,7 @@ class AbstractRepository(Generic[T]):
         self.get_collection().bulk_write(bulk_operations)
 
     def delete(self, model: T):
-        return self.get_collection().delete_one({"_id": model.id})
+        return self.get_collection().delete_one({"_id": cast(ModelWithId, model).id})
 
     def delete_by_id(self, _id: Any):
         return self.get_collection().delete_one({"_id": _id})
@@ -198,7 +203,7 @@ class AbstractRepository(Generic[T]):
             cursor.limit(limit)
         if skip:
             cursor.skip(skip)
-        if sort:
+        if mapped_sort:
             cursor.sort(mapped_sort)
         return map(lambda doc: self.to_model_custom(output_type, doc), cursor)
 
@@ -285,7 +290,7 @@ class AbstractRepository(Generic[T]):
         )
 
         return map(
-            lambda model: Edge[T](
+            lambda model: Edge[OutputT](
                 node=model,
                 cursor=encode_pagination_cursor(
                     get_pagination_cursor_payload(model, sort_keys)

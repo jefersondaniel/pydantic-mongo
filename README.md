@@ -17,9 +17,9 @@ pip install pydantic-mongo
 ```python
 from bson import ObjectId
 from pydantic import BaseModel
-from pydantic_mongo import AbstractRepository, ObjectIdField
+from pydantic_mongo import AbstractRepository, PydanticObjectId
 from pymongo import MongoClient
-from typing import List
+from typing import Optional, List
 import os
 
 class Foo(BaseModel):
@@ -31,7 +31,8 @@ class Bar(BaseModel):
    banana: str = 'y'
 
 class Spam(BaseModel):
-   id: ObjectIdField = None
+   # PydanticObjectId is an alias to Annotated[ObjectId, ObjectIdAnnotation]
+   id: Optional[PydanticObjectId] = None
    foo: Foo
    bars: List[Bar]
 
@@ -64,7 +65,7 @@ spam_repository.delete(spam)
 # Find One By Id
 result = spam_repository.find_one_by_id(spam.id)
 
-# Find One By Id using string if the id attribute is a ObjectIdField
+# Find One By Id using string if the id attribute is a PydanticObjectId
 result = spam_repository.find_one_by_id(ObjectId('611827f2878b88b49ebb69fc'))
 assert result.foo.count == 2
 

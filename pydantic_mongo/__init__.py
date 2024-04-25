@@ -1,5 +1,10 @@
 from .abstract_repository import AbstractRepository
-from .fields import ObjectIdField
+from .fields import ObjectIdAnnotation, ObjectIdField, PydanticObjectId
 from .version import __version__  # noqa: F401
 
-__all__ = ["ObjectIdField", "AbstractRepository"]
+__all__ = [
+    "AbstractRepository",
+    "ObjectIdField",
+    "ObjectIdAnnotation",
+    "PydanticObjectId",
+]

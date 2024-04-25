@@ -2,9 +2,10 @@ from typing import Any
 
 from bson import ObjectId
 from pydantic_core import core_schema
+from typing_extensions import Annotated
 
 
-class ObjectIdField(ObjectId):
+class ObjectIdAnnotation:
     @classmethod
     def __get_pydantic_core_schema__(
         cls, _source_type: Any, _handler: Any
@@ -31,3 +32,13 @@ class ObjectIdField(ObjectId):
             raise ValueError("Invalid id")
 
         return ObjectId(value)
+
+
+# Deprecated, use PydanticObjectId instead.
+class ObjectIdField(ObjectId):
+    @classmethod
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
+        return ObjectIdAnnotation.__get_pydantic_core_schema__(_source_type, _handler)
+
+
+PydanticObjectId = Annotated[ObjectId, ObjectIdAnnotation]
