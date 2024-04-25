@@ -31,6 +31,7 @@ class Bar(BaseModel):
    banana: str = 'y'
 
 class Spam(BaseModel):
+   # PydanticObjectId is an alias to Annotated[ObjectId, ObjectIdAnnotation]
    id: Optional[PydanticObjectId] = None
    foo: Foo
    bars: List[Bar]
