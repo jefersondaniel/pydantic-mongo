@@ -27,5 +27,6 @@ class TestFields:
         assert {
             "title": "User",
             "type": "object",
-            "properties": {"id": {"default": None, "title": "Id", "type": "string"}},
+            "properties": {"id": {"title": "Id", "type": "string"}},
+            "required": ["id"],
         } == schema

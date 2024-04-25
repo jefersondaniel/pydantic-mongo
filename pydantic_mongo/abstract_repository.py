@@ -57,8 +57,6 @@ class AbstractRepository(Generic[T]):
         return self.__database[self.__collection_name]
 
     def __validate(self):
-        if not issubclass(self.__document_class, BaseModel):
-            raise Exception("Document class should inherit BaseModel")
         if "id" not in self.__document_class.model_fields:
             raise Exception("Document class should have id field")
         if not self.__collection_name:

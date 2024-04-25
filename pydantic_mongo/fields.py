@@ -37,10 +37,6 @@ class ObjectIdAnnotation:
 # Deprecated, use PydanticObjectId instead.
 class ObjectIdField(ObjectId):
     @classmethod
-    def validate(cls, value):
-        return ObjectIdAnnotation.validate(value)
-
-    @classmethod
     def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
         return ObjectIdAnnotation.__get_pydantic_core_schema__(_source_type, _handler)
 
