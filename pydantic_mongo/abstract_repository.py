@@ -70,7 +70,7 @@ class AbstractRepository(Generic[T]):
         :return: dict
         """
         model_with_id = cast(ModelWithId, model)
-        data = model_with_id.model_dump()
+        data = model_with_id.model_dump(mode='json')
         data.pop("id")
         if model_with_id.id:
             data["_id"] = model_with_id.id
