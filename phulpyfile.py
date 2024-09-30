@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from os import system, unlink
+from os import system
 from os.path import dirname, join
 
 from phulpy import task
@@ -46,6 +46,6 @@ def integration_test(phulpy):
 
 @task
 def typecheck(phulpy):
-    result = system('mypy pydantic_mongo test --check-untyped-defs')
+    result = system("mypy pydantic_mongo test --check-untyped-defs")
     if result:
         raise Exception("lint test failed")

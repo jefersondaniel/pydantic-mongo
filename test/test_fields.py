@@ -1,5 +1,4 @@
 import pytest
-from typing import Optional
 from bson import ObjectId
 from pydantic import BaseModel, ValidationError
 

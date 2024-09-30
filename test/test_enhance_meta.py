@@ -1,7 +1,8 @@
 import pytest
-from pydantic import BaseModel, Field
-from pydantic_mongo import AbstractRepository, PydanticObjectId
+from pydantic import BaseModel
 from typing_extensions import Optional
+
+from pydantic_mongo import AbstractRepository, PydanticObjectId
 
 
 class HamModel(BaseModel):
