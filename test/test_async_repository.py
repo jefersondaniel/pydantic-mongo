@@ -41,7 +41,7 @@ def database():
     return client.db
 
 
-class AsyncTestRepository:
+class TestAsyncRepository:
     @pytest.mark.asyncio
     async def test_save(self, database):
         spam_repository = SpamRepository(database=database)
@@ -50,20 +50,22 @@ class AsyncTestRepository:
         spam = Spam(foo=foo, bars=[bar])
         await spam_repository.save(spam)
 
+        result = await database["spams"].find().to_list(length=None)
         assert {
             "_id": ObjectId(spam.id),
             "foo": {"count": 1, "size": 1.0},
             "bars": [{"apple": "x", "banana": "y"}],
-        } == database["spams"].find()[0]
+        } == result[0]
 
         cast(Foo, spam.foo).count = 2
         await spam_repository.save(spam)
 
+        result = await database["spams"].find().to_list(length=None)
         assert {
             "_id": ObjectId(spam.id),
             "foo": {"count": 2, "size": 1.0},
             "bars": [{"apple": "x", "banana": "y"}],
-        } == database["spams"].find()[0]
+        } == result[0]
 
     @pytest.mark.asyncio
     async def test_save_upsert(self, database):
@@ -73,11 +75,12 @@ class AsyncTestRepository:
         )
         await spam_repository.save(spam)
 
+        result = await database["spams"].find().to_list(length=None)
         assert {
             "_id": ObjectId(spam.id),
             "foo": {"count": 1, "size": 1.0},
             "bars": [],
-        } == database["spams"].find()[0]
+        } == result[0]
 
     @pytest.mark.asyncio
     async def test_save_many(self, database):
@@ -101,11 +104,13 @@ class AsyncTestRepository:
             },
         ]
 
-        assert initial_data == list(database["spams"].find())
+        result = await database["spams"].find().to_list(length=None)
+        assert initial_data == result
 
         # Calling save_many again will only update
         await spam_repository.save_many(spams)
-        assert initial_data == list(database["spams"].find())
+        result = await database["spams"].find().to_list(length=None)
+        assert initial_data == result
 
         # Calling save_many with only a new model will only insert
         new_span = Spam()
