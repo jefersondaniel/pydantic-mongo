@@ -3,6 +3,8 @@ from typing import List, Optional, cast
 import mongomock
 import pytest
 from bson import ObjectId
+from datetime import datetime, timezone
+from enum import Enum
 from pydantic import BaseModel, Field
 
 from pydantic_mongo import AbstractRepository, PydanticObjectId
@@ -28,6 +30,22 @@ class Spam(BaseModel):
 class SpamRepository(AbstractRepository[Spam]):
     class Meta:
         collection_name = "spams"
+
+
+class State(Enum):
+    Preparation = "Preparation"
+    Processing = "Processing"
+
+
+class Order(BaseModel):
+    id: Optional[PydanticObjectId] = None
+    created_at: datetime
+    state: Optional[State]
+
+
+class OrderRepository(AbstractRepository[Order]):
+    class Meta:
+        collection_name = "orders"
 
 
 @pytest.fixture
@@ -259,3 +277,25 @@ class TestRepository:
 
         with pytest.raises(PaginationError):
             spam_repository.paginate({}, limit=10, after="invalid string")
+
+    def test_store_enums(self, database):
+        order_repository = OrderRepository(database=database)
+        current_date = datetime.now(tz=timezone.utc)
+
+        order = Order(
+            state=State.Preparation,
+            created_at=current_date
+        )
+        order_repository.save(order)
+
+        mongo_document = database["orders"].find_one({
+            "_id": order.id,
+        })
+
+        assert mongo_document["state"] == "Preparation"
+        assert isinstance(mongo_document["created_at"], datetime)
+
+        find_result = order_repository.find_one_by_id(order.id)
+        assert find_result is not None
+        assert find_result.state == State.Preparation
+        assert find_result.created_at == current_date
