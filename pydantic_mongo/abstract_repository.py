@@ -57,8 +57,10 @@ class AbstractRepository(Generic[T]):
         return self.__database[self.__collection_name]
 
     def __validate(self):
-        if "id" not in self.__document_class.model_fields and \
-            "id" not in self.__document_class.model_computed_fields:
+        if (
+            "id" not in self.__document_class.model_fields
+            and "id" not in self.__document_class.model_computed_fields
+        ):
             raise Exception("Document class should have id field")
         if not self.__collection_name:
             raise Exception("Meta should contain collection name")
