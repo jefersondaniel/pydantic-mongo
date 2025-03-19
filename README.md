@@ -79,3 +79,7 @@ results = spam_repository.find_by({'foo.count': {'$gte': 1}})
 edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1)
 more_edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1, after=list(edges)[-1].cursor)
 ```
+
+### Async Support
+
+For asynchronous applications, you can use `AsyncAbstractRepository` which provides the same functionality as `AbstractRepository` but with async/await support. This is useful when working with PyMongo AsyncMongoClient
