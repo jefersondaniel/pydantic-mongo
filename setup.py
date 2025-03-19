@@ -16,7 +16,7 @@ setup(
     version=version,
     packages=["pydantic_mongo"],
     setup_requires=["wheel"],
-    install_requires=["pymongo>=4.3,<5.0", "pydantic>=2.0.2,<3.0.0"],
+    install_requires=["pymongo>=4.9,<5.0", "pydantic>=2.0.2,<3.0.0"],
     description="Document object mapper for pydantic and pymongo",
     long_description=long_description,
     long_description_content_type="text/markdown",

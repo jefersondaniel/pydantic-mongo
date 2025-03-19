@@ -29,9 +29,12 @@ class BaseAbstractRepository(Generic[T]):
         self.__validate()
 
     def __validate(self):
-        if "id" not in self._document_class.model_fields:
+        if (
+            "id" not in self.__document_class.model_fields
+            and "id" not in self.__document_class.model_computed_fields
+        ):
             raise Exception("Document class should have id field")
-        if not self._collection_name:
+        if not self.__collection_name:
             raise Exception("Meta should contain collection name")
 
     @staticmethod

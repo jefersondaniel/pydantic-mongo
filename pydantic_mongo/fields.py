@@ -21,9 +21,7 @@ class ObjectIdAnnotation:
             python_schema=core_schema.union_schema(
                 [core_schema.is_instance_schema(ObjectId), object_id_schema]
             ),
-            serialization=core_schema.plain_serializer_function_ser_schema(
-                lambda x: str(x)
-            ),
+            serialization=core_schema.plain_serializer_function_ser_schema(str),
         )
 
     @classmethod
