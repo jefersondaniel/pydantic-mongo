@@ -1,8 +1,8 @@
 from typing import Any, Dict, Iterable, Optional, Type, Union, cast
 
 from pymongo import UpdateOne
-from pymongo.collection import Collection
-from pymongo.database import Database
+from pymongo.asynchronous.collection import AsyncCollection
+from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.results import InsertOneResult, UpdateResult
 
 from .base_abstract_repository import (
@@ -15,21 +15,21 @@ from .base_abstract_repository import (
 from .pagination import Edge, encode_pagination_cursor, get_pagination_cursor_payload
 
 
-class AbstractRepository(BaseAbstractRepository[T]):
+class AsyncAbstractRepository(BaseAbstractRepository[T]):
     class Meta:
         collection_name: str
 
-    def __init__(self, database: Database):
-        self.__database: Database = database
+    def __init__(self, database: AsyncDatabase):
+        self.__database: AsyncDatabase = database
         super().__init__()
 
-    def get_collection(self) -> Collection:
+    def get_collection(self) -> AsyncCollection:
         """
         Get pymongo collection
         """
         return self.__database[self._collection_name]
 
-    def save(self, model: T) -> Union[InsertOneResult, UpdateResult]:
+    async def save(self, model: T) -> Union[InsertOneResult, UpdateResult]:
         """
         Save entity to database. It will update the entity if it has id, otherwise it will insert it.
         """
@@ -38,15 +38,15 @@ class AbstractRepository(BaseAbstractRepository[T]):
 
         if model_with_id.id:
             mongo_id = document.pop("_id")
-            return self.get_collection().update_one(
+            return await self.get_collection().update_one(
                 {"_id": mongo_id}, {"$set": document}, upsert=True
             )
 
-        result = self.get_collection().insert_one(document)
+        result = await self.get_collection().insert_one(document)
         model_with_id.id = result.inserted_id
         return result
 
-    def save_many(self, models: Iterable[T]):
+    async def save_many(self, models: Iterable[T]):
         """
         Save multiple entities to database
         """
@@ -60,7 +60,7 @@ class AbstractRepository(BaseAbstractRepository[T]):
             else:
                 models_to_insert.append(model)
         if len(models_to_insert) > 0:
-            result = self.get_collection().insert_many(
+            result = await self.get_collection().insert_many(
                 (self.to_document(model) for model in models_to_insert)
             )
 
@@ -76,30 +76,32 @@ class AbstractRepository(BaseAbstractRepository[T]):
             UpdateOne({"_id": mongo_id}, {"$set": document}, upsert=True)
             for mongo_id, document in zip(mongo_ids, documents_to_update)
         ]
-        self.get_collection().bulk_write(bulk_operations)
+        await self.get_collection().bulk_write(bulk_operations)
 
-    def delete(self, model: T):
-        return self.get_collection().delete_one({"_id": cast(ModelWithId, model).id})
+    async def delete(self, model: T):
+        return await self.get_collection().delete_one(
+            {"_id": cast(ModelWithId, model).id}
+        )
 
-    def delete_by_id(self, _id: Any):
-        return self.get_collection().delete_one({"_id": _id})
+    async def delete_by_id(self, _id: Any):
+        return await self.get_collection().delete_one({"_id": _id})
 
-    def find_one_by_id(self, _id: Any) -> Optional[T]:
+    async def find_one_by_id(self, _id: Any) -> Optional[T]:
         """
         Find entity by id
 
         Note: The id should be of the same type as the id field in the document class, ie. ObjectId
         """
-        return self.find_one_by({"id": _id})
+        return await self.find_one_by({"id": _id})
 
-    def find_one_by(self, query: dict) -> Optional[T]:
+    async def find_one_by(self, query: dict) -> Optional[T]:
         """
         Find entity by mongo query
         """
-        result = self.get_collection().find_one(self._map_id(query))
+        result = await self.get_collection().find_one(self._map_id(query))
         return self.to_model(result) if result else None
 
-    def find_by_with_output_type(
+    async def find_by_with_output_type(
         self,
         output_type: Type[OutputT],
         query: dict,
@@ -127,9 +129,10 @@ class AbstractRepository(BaseAbstractRepository[T]):
             cursor.skip(skip)
         if mapped_sort:
             cursor.sort(mapped_sort)
-        return map(lambda doc: self.to_model_custom(output_type, doc), cursor)
 
-    def find_by(
+        return [self.to_model_custom(output_type, doc) async for doc in cursor]
+
+    async def find_by(
         self,
         query: dict,
         skip: Optional[int] = None,
@@ -140,7 +143,7 @@ class AbstractRepository(BaseAbstractRepository[T]):
         """ "
         Find entities by mongo query
         """
-        return self.find_by_with_output_type(
+        return await self.find_by_with_output_type(
             output_type=self._document_class,
             query=query,
             skip=skip,
@@ -149,7 +152,7 @@ class AbstractRepository(BaseAbstractRepository[T]):
             projection=projection,
         )
 
-    def paginate_with_output_type(
+    async def paginate_with_output_type(
         self,
         output_type: Type[OutputT],
         query: dict,
@@ -170,7 +173,7 @@ class AbstractRepository(BaseAbstractRepository[T]):
         for sort_expression in sort:
             sort_keys.append(sort_expression[0])
 
-        models = self.find_by_with_output_type(
+        models = await self.find_by_with_output_type(
             output_type,
             query=self.get_pagination_query(
                 query=query, after=after, before=before, sort=sort
@@ -190,7 +193,7 @@ class AbstractRepository(BaseAbstractRepository[T]):
             models,
         )
 
-    def paginate(
+    async def paginate(
         self,
         query: dict,
         limit: int,
@@ -204,7 +207,7 @@ class AbstractRepository(BaseAbstractRepository[T]):
 
         Return type is an iterable of Edge objects, which contain the model and the cursor
         """
-        return self.paginate_with_output_type(
+        return await self.paginate_with_output_type(
             self._document_class,
             query,
             limit,

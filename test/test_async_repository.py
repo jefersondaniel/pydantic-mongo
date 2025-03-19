@@ -1,11 +1,12 @@
 from typing import List, Optional, cast
 
-import mongomock
 import pytest
 from bson import ObjectId
 from pydantic import BaseModel, Field
+from pymongo import AsyncMongoClient
 
 from pydantic_mongo import AbstractRepository, PydanticObjectId
+from pydantic_mongo.async_abstract_repository import AsyncAbstractRepository
 from pydantic_mongo.errors import PaginationError
 
 
@@ -25,59 +26,70 @@ class Spam(BaseModel):
     bars: Optional[List[Bar]] = None
 
 
-class SpamRepository(AbstractRepository[Spam]):
+class SpamRepository(AsyncAbstractRepository[Spam]):
     class Meta:
         collection_name = "spams"
 
 
 @pytest.fixture
 def database():
-    return mongomock.MongoClient().db
+    import asyncio
+
+    client: AsyncMongoClient = AsyncMongoClient("mongodb://localhost:27017")
+    asyncio.run(client.drop_database("db"))
+
+    return client.db
 
 
-class TestRepository:
-    def test_save(self, database):
+class TestAsyncRepository:
+    @pytest.mark.asyncio
+    async def test_save(self, database):
         spam_repository = SpamRepository(database=database)
         foo = Foo(count=1, size=1.0)
         bar = Bar()
         spam = Spam(foo=foo, bars=[bar])
-        spam_repository.save(spam)
+        await spam_repository.save(spam)
 
+        result = await database["spams"].find().to_list(length=None)
         assert {
             "_id": ObjectId(spam.id),
             "foo": {"count": 1, "size": 1.0},
             "bars": [{"apple": "x", "banana": "y"}],
-        } == database["spams"].find()[0]
+        } == result[0]
 
         cast(Foo, spam.foo).count = 2
-        spam_repository.save(spam)
+        await spam_repository.save(spam)
 
+        result = await database["spams"].find().to_list(length=None)
         assert {
             "_id": ObjectId(spam.id),
             "foo": {"count": 2, "size": 1.0},
             "bars": [{"apple": "x", "banana": "y"}],
-        } == database["spams"].find()[0]
+        } == result[0]
 
-    def test_save_upsert(self, database):
+    @pytest.mark.asyncio
+    async def test_save_upsert(self, database):
         spam_repository = SpamRepository(database=database)
         spam = Spam(
             id=ObjectId("65012da68ea5a4798502f710"), foo=Foo(count=1, size=1.0), bars=[]
         )
-        spam_repository.save(spam)
+        await spam_repository.save(spam)
 
+        result = await database["spams"].find().to_list(length=None)
         assert {
             "_id": ObjectId(spam.id),
             "foo": {"count": 1, "size": 1.0},
             "bars": [],
-        } == database["spams"].find()[0]
+        } == result[0]
 
-    def test_save_many(self, database):
+    @pytest.mark.asyncio
+    async def test_save_many(self, database):
         spam_repository = SpamRepository(database=database)
         spams = [
             Spam(),
             Spam(id=ObjectId("65012da68ea5a4798502f710")),
         ]
-        spam_repository.save_many(spams)
+        await spam_repository.save_many(spams)
 
         initial_data = [
             {
@@ -92,49 +104,54 @@ class TestRepository:
             },
         ]
 
-        assert initial_data == list(database["spams"].find())
+        result = await database["spams"].find().to_list(length=None)
+        assert initial_data == result
 
         # Calling save_many again will only update
-        spam_repository.save_many(spams)
-        assert initial_data == list(database["spams"].find())
+        await spam_repository.save_many(spams)
+        result = await database["spams"].find().to_list(length=None)
+        assert initial_data == result
 
         # Calling save_many with only a new model will only insert
         new_span = Spam()
-        spam_repository.save_many([new_span])
+        await spam_repository.save_many([new_span])
         assert new_span.id is not None
-        assert 3 == database["spams"].count_documents({})
+        assert 3 == await database["spams"].count_documents({})
 
-    def test_delete(self, database):
+    @pytest.mark.asyncio
+    async def test_delete(self, database):
         spam_repository = SpamRepository(database=database)
         foo = Foo(count=1, size=1.0)
         bar = Bar()
         spam = Spam(foo=foo, bars=[bar])
-        spam_repository.save(spam)
+        await spam_repository.save(spam)
 
-        result = spam_repository.find_one_by_id(spam.id)
+        result = await spam_repository.find_one_by_id(spam.id)
         assert result is not None
 
-        spam_repository.delete(spam)
-        result = spam_repository.find_one_by_id(spam.id)
+        await spam_repository.delete(spam)
+        result = await spam_repository.find_one_by_id(spam.id)
         assert result is None
 
-    def test_delete_by_id(self, database):
+    @pytest.mark.asyncio
+    async def test_delete_by_id(self, database):
         spam_repository = SpamRepository(database=database)
         foo = Foo(count=1, size=1.0)
         bar = Bar()
         spam = Spam(foo=foo, bars=[bar])
-        spam_repository.save(spam)
+        await spam_repository.save(spam)
 
-        result = spam_repository.find_one_by_id(spam.id)
+        result = await spam_repository.find_one_by_id(spam.id)
         assert result is not None
 
-        spam_repository.delete_by_id(spam.id)
-        result = spam_repository.find_one_by_id(spam.id)
+        await spam_repository.delete_by_id(spam.id)
+        result = await spam_repository.find_one_by_id(spam.id)
         assert result is None
 
-    def test_find_by_id(self, database):
+    @pytest.mark.asyncio
+    async def test_find_by_id(self, database):
         spam_id = ObjectId("611827f2878b88b49ebb69fc")
-        database.spams.insert_one(
+        await database["spams"].insert_one(
             {
                 "_id": spam_id,
                 "foo": {"count": 2, "size": 1.0},
@@ -143,7 +160,7 @@ class TestRepository:
         )
 
         spam_repository = SpamRepository(database=database)
-        result = spam_repository.find_one_by_id(spam_id)
+        result = await spam_repository.find_one_by_id(spam_id)
 
         assert result is not None
         assert result.bars is not None
@@ -151,8 +168,9 @@ class TestRepository:
         assert spam_id == result.id
         assert "x" == result.bars[0].apple
 
-    def test_find_by(self, database):
-        database.spams.insert_many(
+    @pytest.mark.asyncio
+    async def test_find_by(self, database):
+        await database["spams"].insert_many(
             [
                 {
                     "foo": {"count": 2, "size": 1.0},
@@ -168,7 +186,7 @@ class TestRepository:
         spam_repository = SpamRepository(database=database)
 
         # Simple Find
-        result = spam_repository.find_by({})
+        result = await spam_repository.find_by({})
         results = [x for x in result]
         assert 2 == len(results)
         assert results[0].foo is not None
@@ -177,13 +195,14 @@ class TestRepository:
         assert 3 == results[1].foo.count
 
         # Find with optional parameters
-        result = spam_repository.find_by(
+        result = await spam_repository.find_by(
             {}, skip=10, limit=10, sort=[("foo.count", 1), ("id", 1)]
         )
         results = [x for x in result]
         assert 0 == len(results)
 
-    def test_invalid_model_id_field(self, database):
+    @pytest.mark.asyncio
+    async def test_invalid_model_id_field(self, database):
         class NoIdModel(BaseModel):
             something: str
 
@@ -194,7 +213,8 @@ class TestRepository:
         with pytest.raises(Exception):
             BrokenRepository(database=database)
 
-    def test_invalid_model_collection_name(self, database):
+    @pytest.mark.asyncio
+    async def test_invalid_model_collection_name(self, database):
         class BrokenRepository(AbstractRepository[Spam]):
             class Meta:
                 collection_name = None
@@ -202,8 +222,9 @@ class TestRepository:
         with pytest.raises(Exception):
             BrokenRepository(database=database)
 
-    def test_paginate(self, database):
-        database.spams.insert_many(
+    @pytest.mark.asyncio
+    async def test_paginate(self, database):
+        await database["spams"].insert_many(
             [
                 {
                     "_id": ObjectId("611b140f4eb6ee47e966860f"),
@@ -236,12 +257,12 @@ class TestRepository:
         spam_repository = SpamRepository(database=database)
 
         # Simple Find
-        result = list(spam_repository.paginate({}, limit=10))
+        result = list(await spam_repository.paginate({}, limit=10))
         assert len(result) == 5
 
         # Find After
         result = list(
-            spam_repository.paginate(
+            await spam_repository.paginate(
                 {}, limit=10, after="eNqTYWBgYCljEAFS7AYMidKiXfdOzJWY4V07gYEBAD7HBkg="
             )
         )
@@ -249,11 +270,11 @@ class TestRepository:
 
         # Find Before
         result = list(
-            spam_repository.paginate(
+            await spam_repository.paginate(
                 {}, limit=10, before="eNqTYWBgYCljEAFS7AYMidKiXfdOzJWY4V07gYEBAD7HBkg="
             )
         )
         assert len(result) == 3
 
         with pytest.raises(PaginationError):
-            spam_repository.paginate({}, limit=10, after="invalid string")
+            await spam_repository.paginate({}, limit=10, after="invalid string")
