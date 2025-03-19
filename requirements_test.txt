@@ -3,7 +3,7 @@ setuptools==69.5.1
 coverage==7.5.0
 flake8==7.0.0
 phulpy==1.0.10
-pytest==8.2.0
+pytest==8.3.2
 pytest-cov==4.1.0
 pytest-mock==3.14.0
 mongomock==4.1.2
