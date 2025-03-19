@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.4.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.3.0...v2.4.0) (2025-03-19)
+
+
+### Features
+
+* add AsyncAbstractRepository ([#139](https://github.com/jefersondaniel/pydantic-mongo/issues/139)) ([dd60cae](https://github.com/jefersondaniel/pydantic-mongo/commit/dd60cae9510994ea9c1edb0a065ac97379022a44))
+* Support computed id ([#135](https://github.com/jefersondaniel/pydantic-mongo/issues/135)) ([7b6c85f](https://github.com/jefersondaniel/pydantic-mongo/commit/7b6c85f46611fb45d116eb6a2f8274495bb0d077))
+
+
+### Bug Fixes
+
+* Use str() directly instead of lambda ([#136](https://github.com/jefersondaniel/pydantic-mongo/issues/136)) ([61052d4](https://github.com/jefersondaniel/pydantic-mongo/commit/61052d4c866a5928ae5119775ae45959e069d48d))
+
 ## [2.3.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.2.0...v2.3.0) (2024-04-25)
 
 
