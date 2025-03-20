@@ -1,6 +1,7 @@
 from typing import Any, Generic, Optional, Sequence, Tuple, Type, TypeVar, cast
 
 from pydantic import BaseModel
+from bson import ObjectId
 
 from .pagination import decode_pagination_cursor
 
@@ -104,7 +105,7 @@ class BaseAbstractRepository(Generic[T]):
                 else:
                     compare_operator = "$lt" if sort_expression[1] > 0 else "$gt"
                 dict_values.append(
-                    (sort_expression[0], {compare_operator: cursor_data[i]})
+                    (sort_expression[0], {compare_operator: cursor_data[i] if sort_expression[0] != '_id' else ObjectId(cursor_data[i])})
                 )
             generated_query["$and"].append(dict(dict_values))
 
