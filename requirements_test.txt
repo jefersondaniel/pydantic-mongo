@@ -1,7 +1,7 @@
 mock
 setuptools==71.1.0
 coverage==7.7.0
-flake8==7.0.0
+flake8==7.1.2
 phulpy==1.0.10
 pytest==8.3.2
 pytest-cov==6.0.0
