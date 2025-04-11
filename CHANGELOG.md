@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.4.0...v3.0.0) (2025-04-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* Fix ObjectId serialization ([#150](https://github.com/jefersondaniel/pydantic-mongo/issues/150))
+
+### Bug Fixes
+
+* Fix ObjectId serialization ([#150](https://github.com/jefersondaniel/pydantic-mongo/issues/150)) ([dc2a2df](https://github.com/jefersondaniel/pydantic-mongo/commit/dc2a2df97c728ef2c990d281bea057feab17df40))
+
 ## [2.4.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.3.0...v2.4.0) (2025-03-19)
 
 
