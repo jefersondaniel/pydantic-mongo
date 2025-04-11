@@ -10,17 +10,13 @@ class User(BaseModel):
 
 
 class TestFields:
-    def test_object_id_validation(self):
+    def test_model_validate(self):
         with pytest.raises(ValidationError):
             User.model_validate({"id": "lala"})
         User.model_validate({"id": "611827f2878b88b49ebb69fc"})
+        User.model_validate({"id": ObjectId("611827f2878b88b49ebb69fc")})
 
-    def test_object_id_serialize(self):
-        lala = User(id=ObjectId("611827f2878b88b49ebb69fc"))
-        json_result = lala.model_dump_json()
-        assert '{"id":"611827f2878b88b49ebb69fc"}' == json_result
-
-    def test_modify_schema(self):
+    def test_model_json_schema(self):
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
         schema = user.model_json_schema()
         assert {
@@ -29,3 +25,19 @@ class TestFields:
             "properties": {"id": {"title": "Id", "type": "string"}},
             "required": ["id"],
         } == schema
+
+    def test_model_dump_json(self):
+        user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
+        dump = user.model_dump_json()
+        assert '{"id":"611827f2878b88b49ebb69fc"}' == dump
+
+    def test_model_dump(self):
+        user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
+        dump = user.model_dump(mode="python")
+        assert {"id": ObjectId("611827f2878b88b49ebb69fc")} == dump
+        dump = user.model_dump(mode="json")
+        assert {"id": "611827f2878b88b49ebb69fc"} == dump
+
+    def test_field_conversion(self):
+        user = User(id="611827f2878b88b49ebb69fc")
+        assert user.id == ObjectId("611827f2878b88b49ebb69fc")
