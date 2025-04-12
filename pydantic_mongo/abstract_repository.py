@@ -16,22 +16,54 @@ from .pagination import Edge, encode_pagination_cursor, get_pagination_cursor_pa
 
 
 class AbstractRepository(BaseAbstractRepository[T]):
+    """A synchronous repository implementation for MongoDB using Pydantic models.
+
+    This class provides a high-level interface for performing CRUD operations on MongoDB
+    collections using Pydantic models for type safety and data validation.
+
+    Example:
+        class UserRepository(AbstractRepository[User]):
+            class Meta:
+                collection_name = 'users'
+
+        repo = UserRepository(database)
+        user = repo.find_one_by_id(user_id)
+
+    Generic type T must be a Pydantic model with an 'id' field.
+    """
+
     class Meta:
         collection_name: str
 
     def __init__(self, database: Database):
+        """Initialize the repository with a MongoDB database connection.
+
+        Args:
+            database: PyMongo Database instance
+        """
         self.__database: Database = database
         super().__init__()
 
     def get_collection(self) -> Collection:
-        """
-        Get pymongo collection
+        """Get the MongoDB collection associated with this repository.
+
+        Returns:
+            Collection: PyMongo Collection instance
         """
         return self.__database[self._collection_name]
 
     def save(self, model: T) -> Union[InsertOneResult, UpdateResult]:
-        """
-        Save entity to database. It will update the entity if it has id, otherwise it will insert it.
+        """Save a model instance to the database.
+
+        This method will:
+        - Insert the model if it doesn't have an ID
+        - Update the model if it has an ID
+
+        Args:
+            model: The model instance to save
+
+        Returns:
+            Union[InsertOneResult, UpdateResult]: The result of the save operation
         """
         document = self.to_document(model)
         model_with_id = cast(ModelWithId, model)
@@ -47,8 +79,14 @@ class AbstractRepository(BaseAbstractRepository[T]):
         return result
 
     def save_many(self, models: Iterable[T]):
-        """
-        Save multiple entities to database
+        """Save multiple model instances to the database in bulk.
+
+        This method optimizes bulk operations by:
+        - Grouping models into insert and update operations
+        - Performing bulk inserts and updates
+
+        Args:
+            models: Iterable of model instances to save
         """
         models_to_insert = []
         models_to_update = []
@@ -79,22 +117,50 @@ class AbstractRepository(BaseAbstractRepository[T]):
         self.get_collection().bulk_write(bulk_operations)
 
     def delete(self, model: T):
+        """Delete a model instance from the database.
+
+        Args:
+            model: The model instance to delete
+
+        Returns:
+            DeleteResult: The result of the delete operation
+        """
         return self.get_collection().delete_one({"_id": cast(ModelWithId, model).id})
 
     def delete_by_id(self, _id: Any):
+        """Delete a model instance from the database by its ID.
+
+        Args:
+            _id: The ID of the model instance to delete
+
+        Returns:
+            DeleteResult: The result of the delete operation
+        """
         return self.get_collection().delete_one({"_id": _id})
 
     def find_one_by_id(self, _id: Any) -> Optional[T]:
-        """
-        Find entity by id
+        """Find a single model instance by its ID.
 
-        Note: The id should be of the same type as the id field in the document class, ie. ObjectId
+        Args:
+            _id: The ID to search for. Must match the type of the model's ID field
+                (typically ObjectId for MongoDB)
+
+        Returns:
+            Optional[T]: The found model instance or None if not found
         """
         return self.find_one_by({"id": _id})
 
     def find_one_by(self, query: dict) -> Optional[T]:
-        """
-        Find entity by mongo query
+        """Find a single model instance by a MongoDB query.
+
+        Args:
+            query: MongoDB query dictionary
+
+        Returns:
+            Optional[T]: The found model instance or None if not found
+
+        Example:
+            user = repo.find_one_by({"email": "user@example.com"})
         """
         result = self.get_collection().find_one(self._map_id(query))
         return self.to_model(result) if result else None
@@ -108,15 +174,21 @@ class AbstractRepository(BaseAbstractRepository[T]):
         sort: Optional[Sort] = None,
         projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[OutputT]:
-        """
-        Find entities by mongo query allowing custom output type
-        :param output_type:
-        :param query:
-        :param skip:
-        :param limit:
-        :param sort:
-        :param projection:
-        :return:
+        """Find multiple model instances with custom output type.
+
+        This method allows querying with a different output model than the repository's
+        base model type, useful for projections and transformations.
+
+        Args:
+            output_type: The Pydantic model class for the output
+            query: MongoDB query dictionary
+            skip: Number of documents to skip
+            limit: Maximum number of documents to return
+            sort: List of (field, direction) tuples for sorting
+            projection: MongoDB projection dictionary
+
+        Returns:
+            Iterable[OutputT]: Iterator of model instances of the specified output type
         """
         mapped_projection = self._map_id(projection) if projection else None
         mapped_sort = self._map_sort(sort) if sort else None
@@ -137,8 +209,17 @@ class AbstractRepository(BaseAbstractRepository[T]):
         sort: Optional[Sort] = None,
         projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[T]:
-        """ "
-        Find entities by mongo query
+        """Find multiple model instances by a MongoDB query.
+
+        Args:
+            query: MongoDB query dictionary
+            skip: Number of documents to skip
+            limit: Maximum number of documents to return
+            sort: List of (field, direction) tuples for sorting
+            projection: MongoDB projection dictionary
+
+        Returns:
+            Iterable[T]: Iterator of model instances
         """
         return self.find_by_with_output_type(
             output_type=self._document_class,
@@ -159,8 +240,23 @@ class AbstractRepository(BaseAbstractRepository[T]):
         sort: Optional[Sort] = None,
         projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[Edge[OutputT]]:
-        """
-        Paginate entities by mongo query allowing custom output type
+        """Paginate through model instances with custom output type.
+
+        This method implements cursor-based pagination which is more reliable than
+        offset-based pagination for large datasets.
+
+        Args:
+            output_type: The Pydantic model class for the output
+            query: MongoDB query dictionary
+            limit: Maximum number of documents per page
+            after: Cursor string for fetching next page
+            before: Cursor string for fetching previous page
+            sort: List of (field, direction) tuples for sorting
+            projection: MongoDB projection dictionary
+
+        Returns:
+            Iterable[Edge[OutputT]]: Iterator of Edge objects containing model instances
+                                     and pagination cursors
         """
         sort_keys = []
 
@@ -199,10 +295,35 @@ class AbstractRepository(BaseAbstractRepository[T]):
         sort: Optional[Sort] = None,
         projection: Optional[Dict[str, int]] = None,
     ) -> Iterable[Edge[T]]:
-        """
-        Paginate entities by mongo query using cursor based pagination
+        """Paginate through model instances using cursor-based pagination.
 
-        Return type is an iterable of Edge objects, which contain the model and the cursor
+        This method implements cursor-based pagination which is more reliable than
+        offset-based pagination for large datasets.
+
+        Args:
+            query: MongoDB query dictionary
+            limit: Maximum number of documents per page
+            after: Cursor string for fetching next page
+            before: Cursor string for fetching previous page
+            sort: List of (field, direction) tuples for sorting
+            projection: MongoDB projection dictionary
+
+        Returns:
+            Iterable[Edge[T]]: Iterator of Edge objects containing model instances
+                               and pagination cursors
+
+        Example:
+            Get first page::
+
+                edges = repo.paginate({"status": "active"}, limit=10)
+
+            Get next page using the last cursor::
+
+                next_edges = repo.paginate(
+                    {"status": "active"},
+                    limit=10,
+                    after=list(edges)[-1].cursor
+                )
         """
         return self.paginate_with_output_type(
             self._document_class,

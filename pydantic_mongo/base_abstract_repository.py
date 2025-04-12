@@ -69,7 +69,19 @@ class BaseAbstractRepository(Generic[T]):
 
     def to_model_custom(self, output_type: Type[OutputT], data: dict) -> OutputT:
         """
-        Convert document to model with custom output type
+        Convert a MongoDB document to a Pydantic model with a custom output type.
+
+        This method handles the mapping of MongoDB's ``_id`` field to the Pydantic model's ``id`` field,
+        ensuring seamless integration between raw MongoDB data and Pydantic models.
+        It's particularly useful when working with custom projections or aggregations where
+        the output structure differs from the repository's primary model.
+
+        Args:
+            output_type: The Pydantic model class to convert the data to.
+            data: The raw dictionary data from MongoDB.
+
+        Returns:
+            OutputT: An instance of the specified Pydantic model with the data mapped accordingly.
         """
         data_copy = data.copy()
         if "_id" in data_copy:
@@ -78,7 +90,17 @@ class BaseAbstractRepository(Generic[T]):
 
     def to_model(self, data: dict) -> T:
         """
-        Convert document to model
+        Convert a MongoDB document to the repository's primary Pydantic model.
+
+        This method is a convenience wrapper around ``to_model_custom`` that uses the
+        repository's default model type. It also handles the mapping of MongoDB's ``_id``
+        field to the Pydantic model's ``id`` field.
+
+        Args:
+            data: The raw dictionary data from MongoDB.
+
+        Returns:
+            T: An instance of the repository's primary Pydantic model with the data mapped accordingly.
         """
         return self.to_model_custom(self._document_class, data)
 
