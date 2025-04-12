@@ -19,7 +19,8 @@ This section describes how to use pydantic-mongo with asynchronous MongoDB opera
             collection_name = 'users'
 
     # Initialize database connection
-    database = AsyncMongoClient('mongodb://localhost:27017/mydb')
+    client = AsyncMongoClient('mongodb://localhost:27017')
+    database = client["mydb"]
 
     # Create repository instance
     user_repo = UserRepository(database)
