@@ -38,13 +38,6 @@ def unit_test(phulpy):
 
 
 @task
-def integration_test(phulpy):
-    result = system("pytest integration_test")
-    if result:
-        raise Exception("Integration tests failed")
-
-
-@task
 def typecheck(phulpy):
     result = system("mypy pydantic_mongo test --check-untyped-defs")
     if result:

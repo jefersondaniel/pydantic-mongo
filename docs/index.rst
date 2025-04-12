@@ -3,7 +3,7 @@
 Pydantic Mongo
 ==============
 
-A Python library that provides an asynchronous and synchronous Abstract Repository pattern for MongoDB using Pydantic models. It simplifies database interactions by offering a high-level interface for CRUD operations while leveraging Pydantic's data validation and serialization capabilities. Easily manage your MongoDB data with type safety and structure, and extend the repositories for custom queries, aggregations, and projections.
+A Python library that offers an easy-to-use Repository pattern for MongoDB, supporting both synchronous and asynchronous operations. It simplifies working with databases by providing a clear interface for CRUD (Create, Read, Update, Delete) operations using Pydantic models. With built-in data validation and serialization from Pydantic, it helps manage your MongoDB data safely.
 
 Features
 --------

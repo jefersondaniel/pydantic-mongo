@@ -7,7 +7,7 @@
 [![Downloads](https://img.shields.io/pypi/dm/pydantic-mongo.svg)](https://pypi.python.org/pypi/pydantic-mongo)
 [![Documentation Status](https://readthedocs.org/projects/pydantic-mongo/badge/?version=latest)](https://pydantic-mongo.readthedocs.io/en/latest/?badge=latest)
 
-A Python library that provides an asynchronous and synchronous Abstract Repository pattern for MongoDB using Pydantic models. It simplifies database interactions by offering a high-level interface for CRUD operations while leveraging Pydantic's data validation and serialization capabilities. Easily manage your MongoDB data with type safety and structure, and extend the repositories for custom queries, aggregations, and projections.
+A Python library that offers an easy-to-use Repository pattern for MongoDB, supporting both synchronous and asynchronous operations. It simplifies working with databases by providing a clear interface for CRUD (Create, Read, Update, Delete) operations using Pydantic models. With built-in data validation and serialization from Pydantic, it helps manage your MongoDB data safely.
 
 [Read the documentation](https://pydantic-mongo.readthedocs.io/)
 
@@ -128,25 +128,30 @@ repo.delete_by_id(ObjectId("..."))
 For asynchronous applications, you can use `AsyncAbstractRepository` which provides the same functionality as `AbstractRepository` but with async/await support:
 
 ```python
+from pymongo import AsyncMongoClient
+from pydantic import BaseModel
 from pydantic_mongo import AsyncAbstractRepository
-from motor.motor_asyncio import AsyncIOMotorClient
 
-# Create async repository
-class AsyncSpamRepository(AsyncAbstractRepository[Spam]):
-   class Meta:
-      collection_name = 'spams'
+class User(BaseModel):
+    id: str
+    name: str
+    email: str
 
-# Connect to database
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-database = client["example"]
-async_repo = AsyncSpamRepository(database)
+class UserRepository(AsyncAbstractRepository[User]):
+    class Meta:
+        collection_name = 'users'
 
-# Use with async/await
-async def example():
-    spam = Spam(foo=Foo(count=1), bars=[Bar()])
-    await async_repo.save(spam)
-    result = await async_repo.find_one_by_id(spam.id)
-    print(result)
+# Initialize database connection
+database = AsyncMongoClient('mongodb://localhost:27017/mydb')
+
+# Create repository instance
+user_repo = UserRepository(database)
+
+# Example usage
+user = User(name='John Doe', email='john@example.com')
+await user_repo.save(user)
+
+user = await user_repo.find_one_by_id(user_id)
 ```
 
 ## License
