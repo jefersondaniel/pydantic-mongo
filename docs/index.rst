@@ -12,7 +12,6 @@ Features
 * Pydantic models integration
 * Type-safe MongoDB operations
 * Cursor-based pagination
-* Customizable document transformations
 
 Contents
 --------

@@ -13,11 +13,10 @@ A Python library that offers an easy-to-use Repository pattern for MongoDB, supp
 
 ## Features
 
-- Type-safe MongoDB operations
-- Synchronous and asynchronous support
-- Pydantic models integration
-- Cursor-based pagination
-- Customizable document transformations
+* Asynchronous and Synchronous support
+* Pydantic models integration
+* Type-safe MongoDB operations
+* Cursor-based pagination
 
 ## Installation
 
