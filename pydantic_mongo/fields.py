@@ -27,7 +27,7 @@ class ObjectIdAnnotation:
             class User(BaseModel):
                 # Using the annotation directly
                 id: Annotated[ObjectId, ObjectIdAnnotation]
-                
+
                 # Or using the provided type alias
                 id: PydanticObjectId  # equivalent to above
 
@@ -109,31 +109,31 @@ Example:
 
         from pydantic import BaseModel
         from pydantic_mongo import PydanticObjectId
-        
+
         class User(BaseModel):
             id: PydanticObjectId
-        
+
         # Create from string - automatically converts to ObjectId
         user = User(id="611827f2878b88b49ebb69fc")
         assert isinstance(user.id, ObjectId)
-        
+
         # Create from ObjectId directly
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
-        
+
         # Invalid ObjectId strings raise ValidationError
         try:
             User(id="invalid")  # Raises ValidationError
         except ValidationError:
             pass
-        
+
         # JSON serialization converts ObjectId to string
         user_json = user.model_dump_json()
         assert user_json == '{"id":"611827f2878b88b49ebb69fc"}'
-        
+
         # Python dict serialization keeps ObjectId
         user_dict = user.model_dump(mode="python")
         assert isinstance(user_dict["id"], ObjectId)
-        
+
         # JSON dict serialization converts to string
         user_json_dict = user.model_dump(mode="json")
         assert isinstance(user_json_dict["id"], str)
