@@ -1,18 +1,32 @@
 # Pydantic Mongo
 
-[![Build Status](https://github.com/jefersondaniel/pydantic-mongo/actions/workflows/test.yml/badge.svg)](https://github.com/jefersondaniel/pydantic-mongo/actions) [![Maintainability](https://api.codeclimate.com/v1/badges/5c92ea54aefa29f919cf/maintainability)](https://codeclimate.com/github/jefersondaniel/pydantic-mongo/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c92ea54aefa29f919cf/test_coverage)](https://codeclimate.com/github/jefersondaniel/pydantic-mongo/test_coverage) [![Version](https://badge.fury.io/py/pydantic-mongo.svg)](https://pypi.python.org/pypi/pydantic-mongo) [![Downloads](https://img.shields.io/pypi/dm/pydantic-mongo.svg)](https://pypi.python.org/pypi/pydantic-mongo)
+[![Build Status](https://github.com/jefersondaniel/pydantic-mongo/actions/workflows/test.yml/badge.svg)](https://github.com/jefersondaniel/pydantic-mongo/actions) 
+[![Maintainability](https://api.codeclimate.com/v1/badges/5c92ea54aefa29f919cf/maintainability)](https://codeclimate.com/github/jefersondaniel/pydantic-mongo/maintainability) 
+[![Test Coverage](https://api.codeclimate.com/v1/badges/5c92ea54aefa29f919cf/test_coverage)](https://codeclimate.com/github/jefersondaniel/pydantic-mongo/test_coverage) 
+[![Version](https://badge.fury.io/py/pydantic-mongo.svg)](https://pypi.python.org/pypi/pydantic-mongo) 
+[![Downloads](https://img.shields.io/pypi/dm/pydantic-mongo.svg)](https://pypi.python.org/pypi/pydantic-mongo)
+[![Documentation Status](https://readthedocs.org/projects/pydantic-mongo/badge/?version=latest)](https://pydantic-mongo.readthedocs.io/en/latest/?badge=latest)
 
-Document object mapper for pydantic and pymongo
+A Python library that offers an easy-to-use Repository pattern for MongoDB, supporting both synchronous and asynchronous operations. It simplifies working with databases by providing a clear interface for CRUD (Create, Read, Update, Delete) operations using Pydantic models. With built-in data validation and serialization from Pydantic, it helps manage your MongoDB data safely.
 
-## Usage
+[Read the documentation](https://pydantic-mongo.readthedocs.io/)
 
-### Install:
+## Features
+
+* Asynchronous and Synchronous support
+* Pydantic models integration
+* Type-safe MongoDB operations
+* Cursor-based pagination
+
+## Installation
 
 ```bash
 pip install pydantic-mongo
 ```
 
-### Example Code
+## Usage Examples
+
+### Defining Models and Repository
 
 ```python
 from bson import ObjectId
@@ -20,8 +34,8 @@ from pydantic import BaseModel
 from pydantic_mongo import AbstractRepository, PydanticObjectId
 from pymongo import MongoClient
 from typing import Optional, List
-import os
 
+# Define your models
 class Foo(BaseModel):
    count: int
    size: float = None
@@ -36,50 +50,109 @@ class Spam(BaseModel):
    foo: Foo
    bars: List[Bar]
 
+# Create a repository
 class SpamRepository(AbstractRepository[Spam]):
    class Meta:
       collection_name = 'spams'
 
+# Connect to database
 client = MongoClient("mongodb://localhost:27017")
 database = client["example"]
+repo = SpamRepository(database)
+```
 
-spam = Spam(foo=Foo(count=1, size=1.0),bars=[Bar()])
+### Creating and Saving Documents
 
+```python
+# Create a new document
+spam = Spam(foo=Foo(count=1, size=1.0), bars=[Bar()])
+
+# Create a document with predefined ID
 spam_with_predefined_id = Spam(
    id=ObjectId("611827f2878b88b49ebb69fc"),
    foo=Foo(count=2, size=2.0),
    bars=[Bar()]
 )
 
-spam_repository = SpamRepository(database=database)
+# Save a single document
+repo.save(spam)  # spam.id is now set to an ObjectId
 
-# Insert / Update
-spam_repository.save(spam)
+# Save multiple documents
+repo.save_many([spam, spam_with_predefined_id])
+```
 
-# Insert / Update many items
-spam_repository.save_many([spam, spam_with_predefined_id])
+### Querying Documents
 
-# Delete
-spam_repository.delete(spam)
+```python
+# Find by ID
+result = repo.find_one_by_id(spam.id)
 
-# Find One By Id
-result = spam_repository.find_one_by_id(spam.id)
-
-# Find One By Id using string if the id attribute is a PydanticObjectId
-result = spam_repository.find_one_by_id(ObjectId('611827f2878b88b49ebb69fc'))
+# Find by ID using string
+result = repo.find_one_by_id(ObjectId('611827f2878b88b49ebb69fc'))
 assert result.foo.count == 2
 
-# Find One By Query
-result = spam_repository.find_one_by({'foo.count': 1})
+# Find one by custom query
+result = repo.find_one_by({'foo.count': 1})
 
-# Find By Query
-results = spam_repository.find_by({'foo.count': {'$gte': 1}})
+# Find multiple documents by query
+results = repo.find_by({'foo.count': {'$gte': 1}})
+```
 
-# Paginate using cursor based pagination
-edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1)
-more_edges = spam_repository.paginate({'foo.count': {'$gte': 1}}, limit=1, after=list(edges)[-1].cursor)
+### Pagination
+
+```python
+# Get first page
+edges = repo.paginate({'foo.count': {'$gte': 1}}, limit=10)
+
+# Get next page using the last cursor
+more_edges = repo.paginate(
+    {'foo.count': {'$gte': 1}}, 
+    limit=10, 
+    after=list(edges)[-1].cursor
+)
+```
+
+### Deleting Documents
+
+```python
+# Delete a document
+repo.delete(spam)
+
+# Delete by ID
+repo.delete_by_id(ObjectId("..."))
 ```
 
 ### Async Support
 
-For asynchronous applications, you can use `AsyncAbstractRepository` which provides the same functionality as `AbstractRepository` but with async/await support. This is useful when working with PyMongo AsyncMongoClient
+For asynchronous applications, you can use `AsyncAbstractRepository` which provides the same functionality as `AbstractRepository` but with async/await support:
+
+```python
+from pymongo import AsyncMongoClient
+from pydantic import BaseModel
+from pydantic_mongo import AsyncAbstractRepository
+
+class User(BaseModel):
+    id: str
+    name: str
+    email: str
+
+class UserRepository(AsyncAbstractRepository[User]):
+    class Meta:
+        collection_name = 'users'
+
+# Initialize database connection
+database = AsyncMongoClient('mongodb://localhost:27017/mydb')
+
+# Create repository instance
+user_repo = UserRepository(database)
+
+# Example usage
+user = User(name='John Doe', email='john@example.com')
+await user_repo.save(user)
+
+user = await user_repo.find_one_by_id(user_id)
+```
+
+## License
+
+MIT License
