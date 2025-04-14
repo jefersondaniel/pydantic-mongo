@@ -3,7 +3,7 @@ setuptools==71.1.0
 coverage==7.7.0
 flake8==7.1.2
 phulpy==1.0.10
-pytest==8.3.2
+pytest==8.3.5
 pytest-cov==6.0.0
 pytest-mock==3.14.0
 pytest-asyncio==0.25.3
