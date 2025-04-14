@@ -1,8 +1,76 @@
-from typing import Any
+from enum import Enum
+from typing import Any, Generic, TypeVar
 
 from bson import ObjectId
+from pydantic import BaseModel
 from pydantic_core import core_schema
 from typing_extensions import Annotated
+
+TEnum = TypeVar("TEnum", bound=Enum)
+
+
+class EnumAnnotation(BaseModel, Generic[TEnum]):
+    """A Pydantic annotation for Enum fields."""
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
+        # Create a schema that validates and converts strings to the enum class
+        enum_type = _source_type
+
+        enum_schema = core_schema.chain_schema(
+            [
+                core_schema.str_schema(),
+                core_schema.no_info_plain_validator_function(
+                    lambda value: cls.validate_enum(value, enum_type)
+                ),
+            ]
+        )
+
+        return core_schema.json_or_python_schema(
+            # For JSON, we'll use a string schema for serialization
+            json_schema=core_schema.str_schema(),
+            # For Python, we'll accept either an enum instance or a string that can be converted
+            python_schema=core_schema.union_schema(
+                [core_schema.is_instance_schema(enum_type), enum_schema]
+            ),
+            # Always serialize to string
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda instance: (
+                    instance.value if isinstance(instance, Enum) else instance
+                )
+            ),
+        )
+
+    @classmethod
+    def validate_enum(cls, value: Any, enum_type: type[TEnum]) -> TEnum:
+        """Validate and convert a value to the Enum type.
+
+        Args:
+            value: The value to validate and convert
+            enum_type: The Enum class to convert to
+
+        Returns:
+            The converted Enum instance
+
+        Raises:
+            ValueError: If the value doesn't match any enum values
+        """
+        try:
+            # Try to find the enum by value
+            return enum_type(value)
+        except ValueError:
+            # If that fails, try to find by name (case insensitive)
+            for member in enum_type:
+                if member.name.lower() == value.lower():
+                    return member
+
+            # If we get here, no match was found
+            valid_values = [e.value for e in enum_type]
+            valid_names = [e.name for e in enum_type]
+            raise ValueError(
+                f"Invalid value '{value}' for {enum_type.__name__}. "
+                f"Valid values: {valid_values}, valid names: {valid_names}"
+            )
 
 
 class ObjectIdAnnotation:

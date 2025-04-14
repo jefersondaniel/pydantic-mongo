@@ -1,6 +1,6 @@
 from .abstract_repository import AbstractRepository
 from .async_abstract_repository import AsyncAbstractRepository
-from .fields import ObjectIdAnnotation, ObjectIdField, PydanticObjectId
+from .fields import EnumAnnotation, ObjectIdAnnotation, ObjectIdField, PydanticObjectId
 from .version import __version__  # noqa: F401
 
 __all__ = [
@@ -9,4 +9,5 @@ __all__ = [
     "ObjectIdField",
     "ObjectIdAnnotation",
     "PydanticObjectId",
+    "EnumAnnotation",
 ]
