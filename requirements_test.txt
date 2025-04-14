@@ -6,7 +6,7 @@ phulpy==1.0.10
 pytest==8.3.2
 pytest-cov==6.0.0
 pytest-mock==3.14.0
-pytest-asyncio==0.25.3
+pytest-asyncio==0.26.0
 mongomock==4.3.0
 pydantic==2.10.6
 pymongo==4.9.2
