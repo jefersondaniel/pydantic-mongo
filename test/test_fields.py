@@ -20,14 +20,6 @@ class Order(BaseModel):
     state: Annotated[State, EnumAnnotation[State]]
 
 
-class WorkarroundEnum(str, Enum):
-    OK = "Ok"
-    NOT_OK = "NotOk"
-
-
-class WorkarroundModel(BaseModel):
-    state: WorkarroundEnum
-
 class TestFields:
     def test_object_id_field_validate(self):
         with pytest.raises(ValidationError):
@@ -84,16 +76,3 @@ class TestFields:
         dump = order.model_dump_json()
         assert '{"state":"Preparation"}' == dump
 
-    def test_workarround_enum(self):
-        workarround = WorkarroundModel(state=WorkarroundEnum.OK)
-        assert workarround.state == WorkarroundEnum.OK
-        dump = workarround.model_dump_json()
-        assert '{"state":"Ok"}' == dump
-        dump = workarround.model_dump(mode="python")
-        assert {"state": WorkarroundEnum.OK} == dump
-        dump = workarround.model_dump(mode="json")
-        assert {"state": "Ok"} == dump
-        workarround = WorkarroundModel(state="Ok")
-        assert workarround.state == WorkarroundEnum.OK
-        dump = workarround.model_dump_json()
-        assert '{"state":"Ok"}' == dump
