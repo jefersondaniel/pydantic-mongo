@@ -1,8 +1,37 @@
-from typing import Any
+from enum import Enum
+from typing import Any, Generic, TypeVar
 
 from bson import ObjectId
+from pydantic import BaseModel
 from pydantic_core import core_schema
 from typing_extensions import Annotated
+
+TEnum = TypeVar("TEnum", bound=Enum)
+
+
+class EnumAnnotation(BaseModel, Generic[TEnum]):
+    """A Pydantic annotation for Enum fields."""
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, _source_type: Any, _handler: Any):
+        if issubclass(_source_type, cls):
+            """
+            There is a weird behavior that makes this be called three times without the expected enum
+            as the _source_type, maybe this is related to the issues
+            https://github.com/pydantic/pydantic/issues/8202 and
+            https://github.com/pydantic/pydantic/issues/3559 of the pydantic mongo project
+            """
+            return core_schema.any_schema()
+
+        return core_schema.enum_schema(
+            _source_type,
+            list(_source_type.__members__.values()),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                lambda instance: (
+                    instance.value if isinstance(instance, Enum) else instance
+                )
+            ),
+        )
 
 
 class ObjectIdAnnotation:
