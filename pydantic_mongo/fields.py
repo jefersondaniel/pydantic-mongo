@@ -58,13 +58,13 @@ class EnumAnnotation(BaseModel, Generic[TEnum]):
         try:
             # Try to find the enum by value
             return enum_type(value)
-        except ValueError:
+        except ValueError as err:
             # If we get here, no match was found
             valid_values = [e.value for e in enum_type]
             raise ValueError(
                 f"Invalid value '{value}' for {enum_type.__name__}. "
                 f"Valid values: {valid_values}"
-            )
+            ) from err
 
 
 class ObjectIdAnnotation:
