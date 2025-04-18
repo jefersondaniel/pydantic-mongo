@@ -59,17 +59,11 @@ class EnumAnnotation(BaseModel, Generic[TEnum]):
             # Try to find the enum by value
             return enum_type(value)
         except ValueError:
-            # If that fails, try to find by name (case insensitive)
-            for member in enum_type:
-                if member.name.lower() == value.lower():
-                    return member
-
             # If we get here, no match was found
             valid_values = [e.value for e in enum_type]
-            valid_names = [e.name for e in enum_type]
             raise ValueError(
                 f"Invalid value '{value}' for {enum_type.__name__}. "
-                f"Valid values: {valid_values}, valid names: {valid_names}"
+                f"Valid values: {valid_values}"
             )
 
 

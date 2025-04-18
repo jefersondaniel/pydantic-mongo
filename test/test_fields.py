@@ -27,7 +27,6 @@ class TestFields:
         User.model_validate({"id": "611827f2878b88b49ebb69fc"})
         User.model_validate({"id": ObjectId("611827f2878b88b49ebb69fc")})
 
-
     def test_object_id_field_json_schema(self):
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
         schema = user.model_json_schema()
@@ -38,12 +37,10 @@ class TestFields:
             "required": ["id"],
         } == schema
 
-
     def test_object_id_field_dump_json(self):
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
         dump = user.model_dump_json()
         assert '{"id":"611827f2878b88b49ebb69fc"}' == dump
-
 
     def test_object_id_field_dump(self):
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
@@ -52,11 +49,9 @@ class TestFields:
         dump = user.model_dump(mode="json")
         assert {"id": "611827f2878b88b49ebb69fc"} == dump
 
-
     def test_object_id_field_conversion(self):
         user = User(id="611827f2878b88b49ebb69fc")
         assert user.id == ObjectId("611827f2878b88b49ebb69fc")
-
 
     def test_enum_field_dump(self):
         order = Order(state=State.Preparation)
@@ -64,7 +59,6 @@ class TestFields:
         json_dump = order.model_dump(mode="json")
         assert python_dump == {"state": "Preparation"}
         assert json_dump == {"state": "Preparation"}
-
 
     def test_enum_field_conversion(self):
         order = Order(state="Preparation")
