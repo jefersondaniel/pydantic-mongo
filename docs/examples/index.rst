@@ -7,7 +7,7 @@ This section covers additional usage patterns for ``pydantic-mongo`` that allow 
    :maxdepth: 2
 
    aggregations
-   async
+   async_support
    custom_methods
    custom_projections
-   enum_fields
+   working_with_enum_fields
