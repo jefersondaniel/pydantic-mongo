@@ -16,8 +16,14 @@ class State(Enum):
     PROCESSING = "Processing"
 
 
+class Color(Enum):
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+
 class Order(BaseModel):
     state: Annotated[State, EnumAnnotation[State]]
+    color: Annotated[Color, EnumAnnotation[Color]]
 
 
 class TestFields:
@@ -54,25 +60,26 @@ class TestFields:
         assert user.id == ObjectId("611827f2878b88b49ebb69fc")
 
     def test_enum_field_dump(self):
-        order = Order(state=State.PREPARATION)
+        order = Order(state=State.PREPARATION, color=Color.RED)
         python_dump = order.model_dump(mode="python")
         json_dump = order.model_dump(mode="json")
-        assert python_dump == {"state": "Preparation"}
-        assert json_dump == {"state": "Preparation"}
+        assert python_dump == {"state": "Preparation", "color": 1}
+        assert json_dump == {"state": "Preparation", "color": 1}
 
     def test_enum_field_conversion(self):
-        order = Order(state="Preparation")
+        order = Order(state="Preparation", color=1)
         assert order.state == State.PREPARATION
-        order = Order(state=State.PREPARATION)
+        assert order.color == Color.RED
+        order = Order(state=State.PREPARATION, color=Color.RED)
         assert order.state == State.PREPARATION
+        assert order.color == Color.RED
 
     def test_enum_field_validation(self):
         with pytest.raises(ValidationError):
-            Order(state="lala")
-        Order(state=State.PREPARATION)  # Should not raise
+            Order(state="lala", color=1)
+        Order(state=State.PREPARATION, color=Color.RED)  # Should not raise
 
     def test_enum_field_dump_json(self):
-        order = Order(state=State.PREPARATION)
+        order = Order(state=State.PREPARATION, color=Color.RED)
         dump = order.model_dump_json()
-        assert '{"state":"Preparation"}' == dump
-
+        assert '{"state":"Preparation","color":1}' == dump
