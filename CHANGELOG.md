@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v3.0.0...v3.1.0) (2025-04-18)
+
+
+### Features
+
+* Enum support ([#155](https://github.com/jefersondaniel/pydantic-mongo/issues/155)) ([89a5fa2](https://github.com/jefersondaniel/pydantic-mongo/commit/89a5fa28a1f7cdbdf7b49ed82c0d8ffa50aed82c))
+
 ## [3.0.0](https://github.com/jefersondaniel/pydantic-mongo/compare/v2.4.0...v3.0.0) (2025-04-11)
 
 
