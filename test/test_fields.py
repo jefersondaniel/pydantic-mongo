@@ -1,5 +1,5 @@
 import pytest
-from bson import ObjectId, BSON
+from bson import ObjectId
 from pydantic import BaseModel, ValidationError
 from enum import Enum
 from typing_extensions import Annotated
@@ -45,15 +45,15 @@ class TestFields:
 
     def test_object_id_field_dump_json(self):
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
-        dump = user.model_dump_json()
-        assert '{"id":"611827f2878b88b49ebb69fc"}' == dump
+        json_dump = user.model_dump_json()
+        assert '{"id":"611827f2878b88b49ebb69fc"}' == json_dump
 
     def test_object_id_field_dump(self):
         user = User(id=ObjectId("611827f2878b88b49ebb69fc"))
-        dump = user.model_dump(mode="python")
-        assert {"id": ObjectId("611827f2878b88b49ebb69fc")} == dump
-        dump = user.model_dump(mode="json")
-        assert {"id": "611827f2878b88b49ebb69fc"} == dump
+        python_dump = user.model_dump(mode="python")
+        json_dump = user.model_dump(mode="json")
+        assert {"id": ObjectId("611827f2878b88b49ebb69fc")} == python_dump
+        assert {"id": "611827f2878b88b49ebb69fc"} == json_dump
 
     def test_object_id_field_conversion(self):
         user = User(id="611827f2878b88b49ebb69fc")
@@ -81,5 +81,5 @@ class TestFields:
 
     def test_enum_field_dump_json(self):
         order = Order(state=State.PREPARATION, color=Color.RED)
-        dump = order.model_dump_json()
-        assert '{"state":"Preparation","color":1}' == dump
+        json_dump = order.model_dump_json()
+        assert json_dump == '{"state":"Preparation","color":1}'
