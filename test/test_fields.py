@@ -76,3 +76,8 @@ class TestFields:
         with pytest.raises(ValidationError):
             Order(state="lala")
         Order(state=State.Preparation)  # Should not raise
+
+    def test_enum_field_dump_json(self):
+        order = Order(state=State.Preparation)
+        dump = order.model_dump_json()
+        assert '{"state":"Preparation"}' == dump
