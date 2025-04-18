@@ -6,7 +6,8 @@ This section covers additional usage patterns for ``pydantic-mongo`` that allow 
 .. toctree::
    :maxdepth: 2
 
-   async
-   custom_projections
    aggregations
+   async
    custom_methods
+   custom_projections
+   enum_fields

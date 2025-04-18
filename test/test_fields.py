@@ -12,13 +12,21 @@ class User(BaseModel):
 
 
 class State(Enum):
-    Preparation = "Preparation"
-    Processing = "Processing"
+    PREPARATION = "Preparation"
+    PROCESSING = "Processing"
 
 
 class Order(BaseModel):
     state: Annotated[State, EnumAnnotation[State]]
 
+
+class WorkarroundEnum(str, Enum):
+    OK = "Ok"
+    NOT_OK = "NotOk"
+
+
+class WorkarroundModel(BaseModel):
+    state: WorkarroundEnum
 
 class TestFields:
     def test_object_id_field_validate(self):
@@ -54,7 +62,7 @@ class TestFields:
         assert user.id == ObjectId("611827f2878b88b49ebb69fc")
 
     def test_enum_field_dump(self):
-        order = Order(state=State.Preparation)
+        order = Order(state=State.PREPARATION)
         python_dump = order.model_dump(mode="python")
         json_dump = order.model_dump(mode="json")
         assert python_dump == {"state": "Preparation"}
@@ -62,16 +70,30 @@ class TestFields:
 
     def test_enum_field_conversion(self):
         order = Order(state="Preparation")
-        assert order.state == State.Preparation
-        order = Order(state=State.Preparation)
-        assert order.state == State.Preparation
+        assert order.state == State.PREPARATION
+        order = Order(state=State.PREPARATION)
+        assert order.state == State.PREPARATION
 
     def test_enum_field_validation(self):
         with pytest.raises(ValidationError):
             Order(state="lala")
-        Order(state=State.Preparation)  # Should not raise
+        Order(state=State.PREPARATION)  # Should not raise
 
     def test_enum_field_dump_json(self):
-        order = Order(state=State.Preparation)
+        order = Order(state=State.PREPARATION)
         dump = order.model_dump_json()
         assert '{"state":"Preparation"}' == dump
+
+    def test_workarround_enum(self):
+        workarround = WorkarroundModel(state=WorkarroundEnum.OK)
+        assert workarround.state == WorkarroundEnum.OK
+        dump = workarround.model_dump_json()
+        assert '{"state":"Ok"}' == dump
+        dump = workarround.model_dump(mode="python")
+        assert {"state": WorkarroundEnum.OK} == dump
+        dump = workarround.model_dump(mode="json")
+        assert {"state": "Ok"} == dump
+        workarround = WorkarroundModel(state="Ok")
+        assert workarround.state == WorkarroundEnum.OK
+        dump = workarround.model_dump_json()
+        assert '{"state":"Ok"}' == dump
