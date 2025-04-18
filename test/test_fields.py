@@ -3,6 +3,7 @@ from bson import ObjectId
 from pydantic import BaseModel, ValidationError
 from enum import Enum
 from typing_extensions import Annotated
+from typing import Optional
 
 from pydantic_mongo import ObjectIdField, EnumAnnotation
 
@@ -21,9 +22,10 @@ class Color(Enum):
     GREEN = 2
     BLUE = 3
 
+
 class Order(BaseModel):
     state: Annotated[State, EnumAnnotation[State]]
-    color: Annotated[Color, EnumAnnotation[Color]]
+    color: Optional[Annotated[Color, EnumAnnotation[Color]]] = None
 
 
 class TestFields:
@@ -83,3 +85,8 @@ class TestFields:
         order = Order(state=State.PREPARATION, color=Color.RED)
         json_dump = order.model_dump_json()
         assert json_dump == '{"state":"Preparation","color":1}'
+
+    def test_enum_field_dump_json_with_none(self):
+        order = Order(state=State.PREPARATION, color=None)
+        json_dump = order.model_dump_json()
+        assert json_dump == '{"state":"Preparation","color":null}'
