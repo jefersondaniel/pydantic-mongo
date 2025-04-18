@@ -1,73 +1,77 @@
-# Working with Enum Fields
+Working with Enum Fields
+========================
 
 When working with MongoDB and Pydantic models, handling Enum fields can be tricky because BSON doesn't automatically serialize Python Enum values. This guide explains two approaches to handle this situation.
 
-## The Problem
+The Problem
+-----------
 
 By default, when you try to save a Pydantic model with an Enum field to MongoDB, you might encounter serialization issues because BSON doesn't know how to handle Python Enum types directly.
 
-```python
-from enum import Enum
-from pydantic import BaseModel
+.. code-block:: python
 
-class OrderStatus(Enum):
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
+    from enum import Enum
+    from pydantic import BaseModel
 
-class Order(BaseModel):
-    status: OrderStatus  # This might cause BSON serialization issues
-```
+    class OrderStatus(Enum):
+        PENDING = "pending"
+        PROCESSING = "processing"
+        COMPLETED = "completed"
 
-## Solution 1: Using EnumAnnotation
+    class Order(BaseModel):
+        status: OrderStatus  # This might cause BSON serialization issues
 
-The recommended approach is to use the `EnumAnnotation` provided by pydantic-mongo. This allows you to work with regular Enum classes while ensuring proper BSON serialization:
+Solution 1: Using EnumAnnotation
+--------------------------------
 
-```python
-from enum import Enum
-from typing_extensions import Annotated
-from pydantic import BaseModel
-from pydantic_mongo import EnumAnnotation
+The recommended approach is to use the ``EnumAnnotation`` provided by pydantic-mongo. This allows you to work with regular Enum classes while ensuring proper BSON serialization:
 
-class OrderStatus(Enum):  # Regular Enum, no str inheritance needed
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
+.. code-block:: python
 
-class Order(BaseModel):
-    status: Annotated[OrderStatus, EnumAnnotation[OrderStatus]]
+    from enum import Enum
+    from typing_extensions import Annotated
+    from pydantic import BaseModel
+    from pydantic_mongo import EnumAnnotation
 
-# Usage
-order = Order(status=OrderStatus.PENDING)
-# Will serialize correctly to BSON
-# The value will be stored as "pending" in MongoDB
+    class OrderStatus(Enum):  # Regular Enum, no str inheritance needed
+        PENDING = "pending"
+        PROCESSING = "processing"
+        COMPLETED = "completed"
 
-# You can also create from string values
-order = Order(status="pending")  # Will be converted to OrderStatus.PENDING
-```
+    class Order(BaseModel):
+        status: Annotated[OrderStatus, EnumAnnotation[OrderStatus]]
 
-The `EnumAnnotation` approach provides works with any Enum class (no need to inherit from `str`).
+    # Usage
+    order = Order(status=OrderStatus.PENDING)
+    # Will serialize correctly to BSON
+    # The value will be stored as "pending" in MongoDB
 
-## Solution 2: String-based Enums
+    # You can also create from string values
+    order = Order(status="pending")  # Will be converted to OrderStatus.PENDING
 
-An alternative approach is to make your Enum class inherit from `str`. This makes the enum values serialize as strings automatically:
+The ``EnumAnnotation`` approach works with any Enum class (no need to inherit from ``str``).
 
-```python
-from enum import Enum
-from pydantic import BaseModel
+Solution 2: String-based Enums
+------------------------------
 
-class OrderStatus(str, Enum):  # Note the str inheritance
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
+An alternative approach is to make your Enum class inherit from ``str``. This makes the enum values serialize as strings automatically:
 
-class Order(BaseModel):
-    status: OrderStatus
+.. code-block:: python
 
-# Usage
-order = Order(status=OrderStatus.PENDING)
-# Will serialize correctly to BSON
-# The value will be stored as "pending" in MongoDB
-```
+    from enum import Enum
+    from pydantic import BaseModel
 
-While this approach is simpler, it requires modifying your enum classes and might not be suitable if you're working with third-party enum classes
+    class OrderStatus(str, Enum):  # Note the str inheritance
+        PENDING = "pending"
+        PROCESSING = "processing"
+        COMPLETED = "completed"
+
+    class Order(BaseModel):
+        status: OrderStatus
+
+    # Usage
+    order = Order(status=OrderStatus.PENDING)
+    # Will serialize correctly to BSON
+    # The value will be stored as "pending" in MongoDB
+
+While this approach is simpler, it requires modifying your enum classes and might not be suitable if you're working with third-party enum classes.
