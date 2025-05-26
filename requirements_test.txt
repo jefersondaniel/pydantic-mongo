@@ -1,5 +1,5 @@
 mock
-setuptools==71.1.0
+setuptools==80.8.0
 coverage==7.7.0
 flake8==7.1.2
 phulpy==1.0.10
