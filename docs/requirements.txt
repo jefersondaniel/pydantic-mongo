@@ -15,7 +15,7 @@ packaging==24.2
 pydantic==2.11.3
 pydantic_core==2.33.1
 Pygments==2.19.1
-pymongo==4.12.0
+pymongo==4.14.0
 requests==2.32.3
 roman-numerals-py==3.1.0
 snowballstemmer==2.2.0
